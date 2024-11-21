@@ -169,6 +169,12 @@ const incidentSchema = new mongoose.Schema({
         ref: 'User'
       }
     }]
+  },
+
+  city: {
+    type: String,
+    required: true,
+    trim: true
   }
 }, {
   timestamps: true

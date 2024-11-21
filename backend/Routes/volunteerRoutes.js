@@ -4,8 +4,9 @@ import { requireVolunteerRole } from '../Middleware/roleMiddleware.js';
 import {
     getIncidentDetails,
     updateVolunteerStatus,
-    getVolunteerNotifications
-} from '../controllers/volunteerController.js';
+    getVolunteerNotifications,
+    getVolunteerIncidents
+} from '../Controllers/volunteerController.js';
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ const router = express.Router();
 router.get('/incidents/:incident_id', protectedRoute, getIncidentDetails);
 router.post('/incidents/:incident_id/volunteer/update',protectedRoute, updateVolunteerStatus);
 router.get('/notifications', protectedRoute, getVolunteerNotifications);
+router.get('/incidents', protectedRoute, requireVolunteerRole, getVolunteerIncidents);
 
 export default router;

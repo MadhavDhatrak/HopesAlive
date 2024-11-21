@@ -8,10 +8,15 @@ import Notification from '../models/Notification.js';
 export const getIncidentDetails = async (req, res) => {
     try {
         const { incident_id } = req.params;
+        const volunteerCity = req.user.city;
         
-        const incident = await Incident.findById(incident_id);
+        const incident = await Incident.findOne({
+            _id: incident_id,
+            city: volunteerCity
+        });
+
         if (!incident) {
-            return res.status(404).json({ message: "Incident not found" });
+            return res.status(404).json({ message: "Incident not found or not accessible in your city" });
         }
 
         // Return information matching your incident model structure
@@ -39,12 +44,17 @@ export const updateVolunteerStatus = async (req, res) => {
         const { incident_id } = req.params;
         const { volunteer_status } = req.body;
         const volunteer_id = req.user._id;
+        const volunteerCity = req.user.city;
 
         console.log("Updating status for volunteer:", volunteer_id); // Debug log
 
-        const incident = await Incident.findById(incident_id);
+        const incident = await Incident.findOne({
+            _id: incident_id,
+            city: volunteerCity
+        });
+        
         if (!incident) {
-            return res.status(404).json({ message: "Incident not found" });
+            return res.status(404).json({ message: "Incident not found or not accessible in your city" });
         }
 
         // Update the incident with volunteer's status
@@ -98,6 +108,27 @@ export const getVolunteerNotifications = async (req, res) => {
         res.status(200).json(notifications);
     } catch (error) {
         console.log("Error fetching notifications:", error); // Debug log
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getVolunteerIncidents = async (req, res) => {
+    try {
+        const volunteerCity = req.user.city;
+        
+        const incidents = await Incident.find({ 
+            city: volunteerCity,
+            'volunteerActivity.status': 'UNASSIGNED'
+        })
+        .select('animalInfo location status createdAt')
+        .sort('-createdAt');
+
+        res.json({
+            success: true,
+            count: incidents.length,
+            data: incidents
+        });
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };

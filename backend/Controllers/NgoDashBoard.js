@@ -5,10 +5,12 @@ import Notification from '../Models/notificationModel.js';
 export const getDashboardOverview = async (req, res) => {
     try {
         const ngoId = req.user._id;
+        const ngoCity = req.user.city;
         
-        // Get incidents assigned to this NGO
+        // Get incidents assigned to this NGO and in same city
         const incidents = await Incident.find({ 
-            'assignedNGO': ngoId 
+            'assignedNGO': ngoId,
+            'city': ngoCity
         })
         .populate('volunteerActivity.assignedVolunteer', 'name contactNumber email')
         .sort('-createdAt');
@@ -24,7 +26,7 @@ export const getDashboardOverview = async (req, res) => {
 
         res.json({
             stats,
-            recentIncidents: incidents.slice(0, 5) // Last 5 incidents
+            recentIncidents: incidents.slice(0, 5)
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -35,8 +37,10 @@ export const getDashboardOverview = async (req, res) => {
 export const getAllIncidents = async (req, res) => {
     try {
         const ngoId = req.user._id;
+        const ngoCity = req.user.city;
         
         const incidents = await Incident.find({ 
+            city: ngoCity,
             'assignedNGO': ngoId 
         })
         .select('animalInfo location status createdAt')
@@ -55,14 +59,18 @@ export const getAllIncidents = async (req, res) => {
 // Get Detailed Incident Information
 export const getDetailedIncident = async (req, res) => {
     try {
-        const incident = await Incident.findById(req.params.incident_id)
+        const ngoCity = req.user.city;
+        const incident = await Incident.findOne({
+            _id: req.params.incident_id,
+            city: ngoCity  // Add city filter
+        })
             .populate('user', 'name email phoneNumber')
             .populate('volunteerActivity.assignedVolunteer', 'name phoneNumber email')
             .populate('caseUpdates.updatedBy', 'name')
             .populate('resources.provided.providedBy', 'name');
 
         if (!incident) {
-            return res.status(404).json({ message: 'Incident not found' });
+            return res.status(404).json({ message: 'Incident not found or not accessible in your city' });
         }
 
         const response = {

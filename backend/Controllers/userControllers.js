@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 // Register Controller
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role, phoneNumber, address, volunteerDetails, ngoDetails } = req.body;
+    const { name, email, password, role, phoneNumber, address, city, volunteerDetails, ngoDetails } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -25,6 +25,7 @@ export const register = async (req, res) => {
       role,
       phoneNumber,
       address,
+      city
     };
 
     // Add role-specific details
