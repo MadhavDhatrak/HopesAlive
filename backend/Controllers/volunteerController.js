@@ -116,19 +116,44 @@ export const getVolunteerIncidents = async (req, res) => {
     try {
         const volunteerCity = req.user.city;
         
+        // Find all unassigned incidents in volunteer's city
         const incidents = await Incident.find({ 
             city: volunteerCity,
-            'volunteerActivity.status': 'UNASSIGNED'
+            status: "pending",  // Only show pending incidents
+            assignedVolunteer: { $exists: false }  // Only show unassigned incidents
         })
-        .select('animalInfo location status createdAt')
+        .select('animalInfo location status createdAt description')
+        .populate('assignedNGO', 'name phoneNumber')
         .sort('-createdAt');
+
+        console.log('Volunteer Dashboard Query:', {
+            city: volunteerCity,
+            foundIncidents: incidents.length
+        });
 
         res.json({
             success: true,
             count: incidents.length,
-            data: incidents
+            debug: {
+                volunteerId: req.user._id,
+                volunteerCity: volunteerCity,
+                totalIncidents: incidents.length
+            },
+            data: incidents.map(incident => ({
+                id: incident._id,
+                location: incident.location,
+                animalInfo: {
+                    description: incident.animalInfo.description,
+                    photo: incident.animalInfo.photo,
+                    severity: incident.animalInfo.aiSeverityAssessment
+                },
+                status: incident.status,
+                createdAt: incident.createdAt,
+                assignedNGO: incident.assignedNGO
+            }))
         });
     } catch (error) {
+        console.error('Error in getVolunteerIncidents:', error);
         res.status(500).json({ message: error.message });
     }
 };
