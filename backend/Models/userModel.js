@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["user", "volunteer", "ngo",],
+    enum: ["user", "volunteer", "ngo"],
     default: "user",
     set: function(val) {
         return val.toLowerCase();

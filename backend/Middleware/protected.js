@@ -2,28 +2,31 @@ import jwt from 'jsonwebtoken';
 import User from '../Models/userModel.js';
 
 const protectedRoute = async (req, res, next) => {
-       try {
-           const token=req.cookies.jwt;
-           if(!token){
-               return res.status(401).json({msg:"Unauthorized"})
-           }
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader?.startsWith('Bearer ')) {
+            return res.status(401).json({ message: "No Bearer token found" });
+        }
 
-           const decode=jwt.verify(token,process.env.JWT_KEY); // this will return the value of means userId
-             if(!decode){
-                 return res.status(401).json({msg:"Unauthorized"})
-             }
-              const user=await User.findById(decode.userId).select("-password");
-                if(!user){
-                    return res.status(401).json({msg:"Unauthorized"})
-                }  
-
-                req.user=user;
-                console.log(req.user._id);
-                next(); 
-       } catch (error) {
-           console.log(error)
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
         
-       }
-}
+        console.log("Decoded token:", decoded); // Debug log
+
+        const user = await User.findById(decoded.userId).select("-password");
+        if (!user) {
+            return res.status(401).json({ message: "User not found" });
+        }
+
+        console.log("Found user:", user); // Debug log
+        console.log("User role:", user.role); // Debug log
+
+        req.user = user;
+        next();
+    } catch (error) {
+        console.log("Auth error:", error); // Debug log
+        res.status(401).json({ message: error.message });
+    }
+};
 
 export default protectedRoute;
