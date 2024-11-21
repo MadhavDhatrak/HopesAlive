@@ -39,19 +39,37 @@ export const getAllIncidents = async (req, res) => {
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
         
+        // Find all incidents in the city
         const incidents = await Incident.find({ 
-            city: ngoCity,
-            'assignedNGO': ngoId 
+            city: ngoCity
+            // Temporarily removed assignedNGO filter to see all incidents
         })
-        .select('animalInfo location status createdAt')
+        .select('animalInfo location status createdAt assignedNGO')
         .sort('-createdAt');
+        
+        console.log('Current NGO ID:', ngoId);
+        console.log('All incidents:', incidents.map(inc => ({
+            id: inc._id,
+            assignedNGO: inc.assignedNGO,
+            city: inc.city
+        })));
 
         res.json({
             success: true,
             count: incidents.length,
+            debug: {
+                ngoId,
+                ngoCity,
+                allIncidents: incidents.map(inc => ({
+                    id: inc._id,
+                    assignedNGO: inc.assignedNGO,
+                    city: inc.city
+                }))
+            },
             data: incidents
         });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ message: error.message });
     }
 };

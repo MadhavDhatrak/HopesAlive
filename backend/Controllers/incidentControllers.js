@@ -7,40 +7,76 @@ export const createIncident = asyncHandler(async (req, res) => {
         const user = req.user;
         const incidentData = JSON.parse(req.body.data);
         
+        // Find an NGO in the same city
         const ngo = await User.findOne({ 
             city: user.city, 
             role: 'ngo' 
         });
-
+        
+        console.log('Found NGO:', {
+            id: ngo?._id,
+            city: ngo?.city,
+            role: ngo?.role
+        });
+        
         if (!ngo) {
             return res.status(404).json({ message: "No NGO found in your city" });
         }
-        
-        if (!incidentData.city) {
-            incidentData.city = user.city;
-        }
-        
-        incidentData.user = user._id;
-        incidentData.assignedNGO = ngo._id;
-        incidentData.reporterInfo = {
-            name: user.name,
-            contactNumber: user.phoneNumber,
-            email: user.email,
-            preferredContactMethod: 'PHONE'
+
+        // Prepare the complete incident data
+        const completeIncidentData = {
+            // Basic fields
+            user: user._id,  // Required: user reference
+            city: user.city,
+            assignedNGO: ngo._id,
+            description: incidentData.description,
+
+            // Reporter info
+            reporterInfo: {
+                name: user.name,
+                contactNumber: user.phoneNumber,
+                email: user.email,
+                preferredContactMethod: 'PHONE'
+            },
+
+            // Location
+            location: {
+                type: "Point",
+                coordinates: incidentData.location.coordinates,
+                address: incidentData.location.address
+            },
+
+            // Status and severity
+            status: "pending",
+            severityAssessment: "pending",
+
+            // Animal info
+            animalInfo: {
+                description: incidentData.animalInfo.description,
+                photo: req.file ? req.file.filename : null,
+                aiSeverityAssessment: {
+                    score: incidentData.animalInfo.aiSeverityAssessment.score,
+                    category: incidentData.animalInfo.aiSeverityAssessment.category,
+                    assessmentDetails: incidentData.animalInfo.aiSeverityAssessment.assessmentDetails || ''
+                }
+            },
+            animalPhoto: req.file ? req.file.filename : null
         };
-        
-        if (req.file) {
-            incidentData.animalPhoto = req.file.filename;
-            incidentData.animalInfo.photo = req.file.filename;
+
+        // Validate required photo
+        if (!req.file) {
+            return res.status(400).json({ message: "Animal photo is required" });
         }
 
-        const incident = await Incident.create(incidentData);
+        console.log('Creating incident with data:', completeIncidentData);
+
+        const incident = await Incident.create(completeIncidentData);
         res.status(201).json(incident);
     } catch (error) {
+        console.error('Error creating incident:', error);
         res.status(400).json({ message: error.message });
     }
 });
-
 export const getIncidents = asyncHandler(async (req, res) => {
     try {
         const userCity = req.user.city;
