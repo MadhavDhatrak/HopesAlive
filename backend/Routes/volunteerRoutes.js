@@ -12,7 +12,7 @@ const router = express.Router();
 
 // Volunteer dashboard routes
 router.get('/incidents/:incident_id', protectedRoute, getIncidentDetails);
-router.post('/incidents/:incident_id/volunteer/update',protectedRoute, updateVolunteerStatus);
+router.put('/incidents/:incident_id/volunteer/update',protectedRoute, updateVolunteerStatus);
 router.get('/notifications', protectedRoute, getVolunteerNotifications);
 router.get('/incidents', protectedRoute, requireVolunteerRole, getVolunteerIncidents);
 

@@ -57,38 +57,49 @@ export const updateVolunteerStatus = async (req, res) => {
             return res.status(404).json({ message: "Incident not found or not accessible in your city" });
         }
 
-        // Update the incident with volunteer's status
-        incident.volunteer_status = volunteer_status;
-        incident.volunteer_id = volunteer_id;
-        incident.last_updated = new Date();
+        // Update the volunteerActivity object instead of volunteer_status
+        incident.volunteerActivity = {
+            assignedVolunteer: volunteer_id,
+            status: mapVolunteerStatus(volunteer_status), // Convert status to match enum
+            assignedAt: incident.volunteerActivity?.assignedAt || new Date(),
+            lastUpdate: new Date()
+        };
 
         await incident.save();
 
         // Create a notification
-        if (volunteer_status === 'accepted') {
-            const notification = new Notification({
-                recipient: volunteer_id,
-                type: 'CASE_UPDATE',
-                message: `You have accepted the incident case for ${incident.animalInfo.description}`,
-                incident: incident_id,
-                createdAt: new Date(),
-                isRead: false
-            });
+        const notification = new Notification({
+            recipient: volunteer_id,
+            type: 'CASE_UPDATE',
+            message: `Volunteer status updated to ${volunteer_status}`,
+            incident: incident_id,
+            createdAt: new Date(),
+            isRead: false
+        });
 
-            console.log("Creating notification:", notification); // Debug log
-
-            await notification.save();
-        }
+        await notification.save();
 
         res.status(200).json({ 
             message: "Status updated successfully",
-            status: volunteer_status 
+            status: volunteer_status,
+            volunteerActivity: incident.volunteerActivity
         });
     } catch (error) {
-        console.log("Error updating status:", error); // Debug log
+        console.error('Error:', error);
         res.status(500).json({ message: error.message });
     }
 };
+
+// Helper function to map status values
+function mapVolunteerStatus(status) {
+    const statusMap = {
+        'On the way': 'ASSIGNED',
+        'Arrived': 'ON_SITE',
+        'Animal rescued': 'ON_SITE',
+        'Completed': 'COMPLETED'
+    };
+    return statusMap[status] || 'UNASSIGNED';
+}
 
 // Get notifications for volunteer
 export const getVolunteerNotifications = async (req, res) => {
