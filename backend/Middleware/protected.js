@@ -18,9 +18,6 @@ const protectedRoute = async (req, res, next) => {
             return res.status(401).json({ message: "User not found" });
         }
 
-        console.log("Found user:", user); // Debug log
-        console.log("User role:", user.role); // Debug log
-
         req.user = user;
         next();
     } catch (error) {
