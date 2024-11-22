@@ -7,28 +7,44 @@ export const createIncident = asyncHandler(async (req, res) => {
         const user = req.user;
         const incidentData = JSON.parse(req.body.data);
         
-        // Find an NGO in the same city
-        const ngo = await User.findOne({ 
-            city: user.city, 
-            role: 'ngo' 
-        });
+        // Find an available NGO in the same city with load balancing
+        const ngo = await User.aggregate([
+            { 
+                $match: { 
+                    city: user.city, 
+                    role: 'ngo',
+                    isActive: true 
+                }
+            },
+            {
+                $lookup: {
+                    from: 'incidents',
+                    localField: '_id',
+                    foreignField: 'assignedNGO',
+                    as: 'assignedIncidents'
+                }
+            },
+            {
+                $addFields: {
+                    incidentCount: { $size: '$assignedIncidents' }
+                }
+            },
+            { $sort: { incidentCount: 1 }},  // Sort by least number of incidents
+            { $limit: 1 }
+        ]);
         
-        console.log('Found NGO:', {
-            id: ngo?._id,
-            city: ngo?.city,
-            role: ngo?.role
-        });
-        
-        if (!ngo) {
+        if (!ngo || ngo.length === 0) {
             return res.status(404).json({ message: "No NGO found in your city" });
         }
+
+        const selectedNGO = ngo[0];  // Get the first NGO from aggregation result
 
         // Prepare the complete incident data
         const completeIncidentData = {
             // Basic fields
-            user: user._id,  // Required: user reference
+            user: user._id,
             city: user.city,
-            assignedNGO: ngo._id,
+            assignedNGO: selectedNGO._id,  // Dynamically assigned NGO
             description: incidentData.description,
 
             // Reporter info
@@ -68,9 +84,19 @@ export const createIncident = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "Animal photo is required" });
         }
 
-        console.log('Creating incident with data:', completeIncidentData);
+        console.log('Creating incident with assignment to NGO:', {
+            ngoId: selectedNGO._id,
+            city: user.city
+        });
 
         const incident = await Incident.create(completeIncidentData);
+        
+        console.log('Created incident:', {
+            id: incident._id,
+            city: incident.city,
+            assignedNGO: incident.assignedNGO
+        });
+
         res.status(201).json(incident);
     } catch (error) {
         console.error('Error creating incident:', error);

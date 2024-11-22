@@ -6,29 +6,68 @@ export const getDashboardOverview = async (req, res) => {
     try {
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
+
+        // First, find all incidents in the city
+        const allCityIncidents = await Incident.find({ 
+            city: ngoCity 
+        });
         
-        // Get incidents assigned to this NGO and in same city
-        const incidents = await Incident.find({ 
-            'assignedNGO': ngoId,
-            'city': ngoCity
-        })
-        .populate('volunteerActivity.assignedVolunteer', 'name contactNumber email')
-        .sort('-createdAt');
+        // Then find incidents assigned to this NGO
+        const ngoIncidents = await Incident.find({ 
+            city: ngoCity,
+            assignedNGO: ngoId
+        });
 
         // Calculate statistics
         const stats = {
-            total: incidents.length,
-            critical: incidents.filter(i => i.animalInfo.aiSeverityAssessment.category === 'CRITICAL').length,
-            pending: incidents.filter(i => i.status === 'pending').length,
-            inProgress: incidents.filter(i => i.status === 'in progress').length,
-            resolved: incidents.filter(i => i.status === 'resolved').length
+            total: ngoIncidents.length,
+            critical: ngoIncidents.filter(inc => 
+                inc.animalInfo?.aiSeverityAssessment?.category === 'HIGH'
+            ).length,
+            pending: ngoIncidents.filter(inc => inc.status === 'pending').length,
+            inProgress: ngoIncidents.filter(inc => inc.status === 'in progress').length,
+            resolved: ngoIncidents.filter(inc => inc.status === 'resolved').length
         };
+
+        // Get 5 most recent incidents
+        const recentIncidents = await Incident.find({ 
+            city: ngoCity,
+            assignedNGO: ngoId
+        })
+        .select('animalInfo location status createdAt')
+        .sort('-createdAt')
+        .limit(5);
+
+        // Enhanced debug information
+        console.log('Dashboard Overview Debug:', {
+            ngoId,
+            ngoCity,
+            totalCityIncidents: allCityIncidents.length,
+            ngoAssignedIncidents: ngoIncidents.length,
+            sampleIncident: allCityIncidents[0] ? {
+                id: allCityIncidents[0]._id,
+                city: allCityIncidents[0].city,
+                assignedNGO: allCityIncidents[0].assignedNGO
+            } : null
+        });
 
         res.json({
             stats,
-            recentIncidents: incidents.slice(0, 5)
+            recentIncidents,
+            debug: {
+                ngoId,
+                ngoCity,
+                totalCityIncidents: allCityIncidents.length,
+                ngoAssignedIncidents: ngoIncidents.length,
+                sampleIncidentAssignment: allCityIncidents[0] ? {
+                    id: allCityIncidents[0]._id,
+                    city: allCityIncidents[0].city,
+                    assignedNGO: allCityIncidents[0].assignedNGO
+                } : null
+            }
         });
     } catch (error) {
+        console.error('Error in getDashboardOverview:', error);
         res.status(500).json({ message: error.message });
     }
 };
