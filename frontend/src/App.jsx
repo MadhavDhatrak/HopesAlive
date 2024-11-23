@@ -9,6 +9,7 @@ import {
 import './App.css'
 import LoginForm from './pages/Login';
 import ReportIncident from './pages/ReportIncident';
+import Dashboard from './pages/Dashboard';
 function App() {
   return (
      <Router>
@@ -17,6 +18,7 @@ function App() {
           <Route path="/register" element={<RegisterForm/>}/>
           <Route path="/login" element={<LoginForm/>}/>
           <Route path="/report-incident" element={<ReportIncident/>}/>
+          <Route path="/dashboard" element={<Dashboard/>}/>
         </Routes>
      </Router>
 

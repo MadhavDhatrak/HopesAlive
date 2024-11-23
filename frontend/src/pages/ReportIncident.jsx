@@ -336,7 +336,7 @@ function ReportIncident() {
                         </label>
                         <textarea
                           rows={2}
-                          className="w-full rounded-xl p-4 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
+                          className="w-full rounded-xl p-3 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
                           placeholder="Provide details about the severity assessment"
                           value={formData.animalInfo.aiSeverityAssessment.assessmentDetails}
                           onChange={(e) => setFormData(prev => ({

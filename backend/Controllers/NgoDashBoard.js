@@ -78,19 +78,20 @@ export const getAllIncidents = async (req, res) => {
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
         
-        // Find all incidents in the city
+        // Find all incidents in the city with user information
         const incidents = await Incident.find({ 
             city: ngoCity
-            // Temporarily removed assignedNGO filter to see all incidents
         })
-        .select('animalInfo location status createdAt assignedNGO')
+        .select('animalInfo location status createdAt assignedNGO user')
+        .populate('user', 'name email phoneNumber')
         .sort('-createdAt');
         
         console.log('Current NGO ID:', ngoId);
         console.log('All incidents:', incidents.map(inc => ({
             id: inc._id,
             assignedNGO: inc.assignedNGO,
-            city: inc.city
+            city: inc.city,
+            reportedBy: inc.user?.name
         })));
 
         res.json({
@@ -102,7 +103,8 @@ export const getAllIncidents = async (req, res) => {
                 allIncidents: incidents.map(inc => ({
                     id: inc._id,
                     assignedNGO: inc.assignedNGO,
-                    city: inc.city
+                    city: inc.city,
+                    reportedBy: inc.user
                 }))
             },
             data: incidents
