@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
-
+import Footer from "../components/Footer"
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -32,7 +30,7 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // ... existing submit logic ...
+     
   };
 
   return (
@@ -189,14 +187,13 @@ const RegisterForm = () => {
             </div>
           </div>
         )}
-         <Link to="/report-incident">
+        
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
         >
           Register
         </button>
-        </Link>
       </form>
     </div>
      <Footer/>
