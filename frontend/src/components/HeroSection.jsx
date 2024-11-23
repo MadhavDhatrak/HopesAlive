@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'; // You'll need to install framer-motion
+import { Link } from 'react-router-dom';
 
 function HeroSection() {
   return (
@@ -27,12 +28,16 @@ function HeroSection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
+             <Link to="/register">
             <button className="px-8 py-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transform hover:-translate-y-1 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
-              Report an Incident
+              Register 
             </button>
-            <button className="px-8 py-4 bg-white text-orange-500 rounded-lg hover:bg-gray-50 transform hover:-translate-y-1 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
-              Join as Volunteer
+            </Link>
+             <Link to="/login">
+            <button  className="px-8 py-4 bg-white text-orange-500 rounded-lg hover:bg-gray-50 transform hover:-translate-y-1 transition-all duration-200 shadow-lg hover:shadow-xl font-medium">
+              Login 
             </button>
+            </Link>
           </div>
         </div>
       </div>

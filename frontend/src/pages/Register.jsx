@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +36,9 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+     <>
+       <Header/>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100"  >
       <form
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
@@ -184,15 +189,18 @@ const RegisterForm = () => {
             </div>
           </div>
         )}
-
+         <Link to="/report-incident">
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
         >
           Register
         </button>
+        </Link>
       </form>
     </div>
+     <Footer/>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +33,14 @@ function Header() {
             <p className='text-black hover:text-orange-400 font-bold cursor-pointer'>Report Incident</p>
             <p className="text-black hover:text-orange-400 font-bold cursor-pointer">Volunteer</p>
             <p className='text-black hover:text-orange-400 font-bold cursor-pointer'>Contact Us</p>
+            <Link to="/dashboard">
+            <p className='text-black hover:text-orange-400 font-bold cursor-pointer'>NGO dashboard</p>
+             </Link>
+
+             <Link to="/Voldash">
+            <p className='text-black hover:text-orange-400 font-bold cursor-pointer'>Voluntter dashboard</p>
+             </Link>
+
          </div>
     </div>
   );
