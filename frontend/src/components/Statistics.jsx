@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import IncidentMap from '../DashboardCompo/IncidentMap';
 
 function Statistics() {
   const [activeCity, setActiveCity] = useState(null);
@@ -21,9 +22,8 @@ function Statistics() {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           {/* Map Visualization */}
           <div className="relative h-[400px] bg-white rounded-xl shadow-lg p-4">
-            {/* Add your map component here */}
             <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-              Interactive Map Coming Soon
+               Map Coming Soon
             </div>
           </div>
 
