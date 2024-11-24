@@ -22,4 +22,5 @@ router.put('/incidents/:incident_id/update', updateIncidentStatus);
 router.get('/notifications', getNotifications);
 router.get('/overview', getDashboardOverview); //
 
+
 export default router;

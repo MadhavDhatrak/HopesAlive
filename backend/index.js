@@ -26,6 +26,7 @@ app.use("/api/users",userRoutes);
 app.use("/api/incidents",incidentRoutes);
 app.use("/api/ngo",ngoRoutes);
 app.use("/api/volunteer",volunteerRoutes);
+app.use("/api/uploads", express.static("uploads"));
 
 app.listen(port, () => {
     connectDB();

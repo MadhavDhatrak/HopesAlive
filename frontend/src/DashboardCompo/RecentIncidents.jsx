@@ -1,88 +1,95 @@
-const demoIncidents = [
-  {
-    id: 1,
-    animalInfo: {
-      photo: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
-      description: "Injured German Shepherd with limping front leg",
-      type: "Dog"
-    },
-    severity: "HIGH",
-    aiSeverityAssessment: { score: 8 },
-    location: "Near Central Park, Nashik",
-    status: "pending",
-    user: {
-      name: "Rahul Sharma",
-      phone: "+91 98765 43210"
-    },
-    createdAt: "2024-03-20T10:30:00Z"
-  },
-  {
-    id: 2,
-    animalInfo: {
-      photo: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba",
-      description: "Stray cat with minor injuries",
-      type: "Cat"
-    },
-    severity: "MEDIUM",
-    aiSeverityAssessment: { score: 5 },
-    location: "MG Road, Nashik",
-    status: "resolved",
-    user: {
-      name: "Priya Patel",
-      phone: "+91 87654 32109"
-    },
-    createdAt: "2024-03-19T15:45:00Z"
-  },
-  {
-    id: 2,
-    animalInfo: {
-      photo: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba",
-      description: "Stray cat with minor injuries",
-      type: "Cat"
-    },
-    severity: "MEDIUM",
-    aiSeverityAssessment: { score: 5 },
-    location: "MG Road, Nashik",
-    status: "resolved",
-    user: {
-      name: "Priya Patel",
-      phone: "+91 87654 32109"
-    },
-    createdAt: "2024-03-19T15:45:00Z"
-  },
-
- 
-];
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const RecentIncidents = () => {
+  const [incidents, setIncidents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchIncidents = async () => {
+      try {
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        
+        const response = await axios.get('http://localhost:3000/api/incidents', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        console.log('Incident data:', response.data);
+        setIncidents(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching incidents:', err);
+        setError('Failed to load incidents');
+        setLoading(false);
+      }
+    };
+
+    fetchIncidents();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6">Recent Incidents</h2>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6">Recent Incidents</h2>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Recent Incidents</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {demoIncidents && demoIncidents.map((incident) => (
-          <div key={incident.id} className="bg-white rounded-lg overflow-hidden shadow-lg">
-            {/* Image with Type Overlay */}
-            <div className="relative h-48">
-              <img
-                src={incident.animalInfo?.photo}
-                alt={incident.animalInfo?.type}
-                className="w-full h-full object-cover"
-              />
+        {incidents && incidents.map((incident) => (
+          <div key={incident._id} className="bg-white rounded-lg overflow-hidden shadow-lg">
+            {/* Image/Placeholder with Type Overlay */}
+            <div className="relative h-48 bg-gray-200 flex items-center justify-center">
+              {incident.animalInfo?.photo && (
+                <img
+                  src={`http://localhost:3000/api/uploads/${incident.animalInfo.photo}`}
+                  alt={incident.animalInfo?.type || 'Animal'}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('Image failed to load:', incident.animalInfo.photo);
+                    e.target.style.display = 'none';
+                  }}
+                />
+              )}
               {/* Type Badge */}
               <div className="absolute top-2 left-2">
                 <span className="bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                  {incident.animalInfo?.type}
+                  {incident.animalInfo?.type || 'Unknown'}
                 </span>
               </div>
               {/* Severity Badge */}
               <div className="absolute top-2 right-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  incident.severity === 'HIGH' ? 'bg-red-500 text-white' :
-                  incident.severity === 'MEDIUM' ? 'bg-yellow-500 text-white' :
-                  'bg-green-500 text-white'
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold text-white ${
+                  incident.animalInfo?.aiSeverityAssessment?.score >= 7 ? 'bg-red-500' :
+                  incident.animalInfo?.aiSeverityAssessment?.score >= 4 ? 'bg-yellow-500' :
+                  'bg-green-500'
                 }`}>
-                  {incident.severity} - Score: {incident.aiSeverityAssessment?.score}
+                  {incident.animalInfo?.aiSeverityAssessment?.score >= 7 ? 'High' :
+                   incident.animalInfo?.aiSeverityAssessment?.score >= 4 ? 'Medium' :
+                   'Low'
+                  }:{incident.animalInfo?.aiSeverityAssessment?.score || 0}
                 </span>
               </div>
             </div>
@@ -103,7 +110,7 @@ const RecentIncidents = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                           d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   </svg>
-                  <span>{incident.location}</span>
+                  <span>{incident.location?.address}</span>
                 </div>
               </div>
 
@@ -122,10 +129,10 @@ const RecentIncidents = () => {
               <div className="border-t border-gray-200 pt-4 mb-4">
                 <div className="space-y-2">
                   <p className="text-sm">
-                    <span className="font-medium">Reported by:</span> {incident.user?.name}
+                    <span className="font-medium">Reported by:</span> {incident.reporterInfo?.name}
                   </p>
                   <p className="text-sm">
-                    <span className="font-medium">Contact:</span> {incident.user?.phone}
+                    <span className="font-medium">Contact:</span> {incident.reporterInfo?.contactNumber}
                   </p>
                   <p className="text-sm">
                     <span className="font-medium">Date:</span> {
