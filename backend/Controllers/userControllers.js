@@ -6,7 +6,34 @@ import jwt from "jsonwebtoken";
 // Register Controller
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role, phoneNumber, address, city, volunteerDetails, ngoDetails } = req.body;
+    console.log('Received registration request:', req.body);
+
+    const { 
+      name, 
+      email, 
+      password, 
+      role, 
+      city,
+      phoneNumber,
+      address,
+      volunteerDetails,
+      ngoDetails 
+    } = req.body;
+
+    // Validate all required fields
+    if (!name || !email || !password || !city || !phoneNumber || !address) {
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        received: { 
+          name: name ? 'exists' : 'missing',
+          email: email ? 'exists' : 'missing',
+          password: password ? 'exists' : 'missing',
+          city: city ? 'exists' : 'missing',
+          phoneNumber: phoneNumber ? 'exists' : 'missing',
+          address: address ? 'exists' : 'missing'
+        }
+      });
+    }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -14,44 +41,49 @@ export const register = async (req, res) => {
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user based on role
+    // Create base user data
     const userData = {
       name,
       email,
       password: hashedPassword,
-      role,
+      role: role || 'user',
+      city,
       phoneNumber,
-      address,
-      city
+      address
     };
 
-    // Add role-specific details
+    // Add role-specific details if they exist
     if (role === "volunteer" && volunteerDetails) {
       userData.volunteerDetails = volunteerDetails;
-    } else if (role === "NGO" && ngoDetails) {
+    } else if (role === "ngo" && ngoDetails) {
       userData.ngoDetails = ngoDetails;
-    } else if (role !== "user") {
-      return res.status(400).json({ message: "Invalid role specified" });
     }
 
     const user = await User.create(userData);
 
     if (user) {
-      // Generate JWT and set cookie
-      generateToken(user._id, res);
+      // Generate token
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_KEY,
+        { expiresIn: '15d' }
+      );
 
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        token: token
       });
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Registration error:', error);
+    res.status(400).json({ 
+      message: error.message || "Registration failed" 
+    });
   }
 };
 

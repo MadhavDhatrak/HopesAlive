@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer"
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "",
+    role: "user",
     city: "",
+    phoneNumber: "",
+    address: "",
     ngoDetails: { registrationNumber: "", organizationType: "", operatingAreas: "" },
     volunteerDetails: { availability: "", skills: "", experience: "" },
   });
@@ -30,7 +36,63 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     
+    
+    const loadingToast = toast.loading('Registering...');
+    console.log(formData);
+    
+    try {
+      // Log the request details
+      console.log('Attempting to connect to:', 'http://localhost:3000/api/users/register');
+      console.log('With data:', formData);
+
+      const response = await fetch('http://localhost:3000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      }).catch(error => {
+        console.error('Fetch error:', error);
+        throw new Error(`Network error: ${error.message}`);
+      });
+
+      // Check if response exists
+      if (!response) {
+        throw new Error('No response received from server');
+      }
+
+      // Log the response status
+      console.log('Response status:', response.status);
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (response.ok) {
+        toast.dismiss(loadingToast);
+        toast.success('Registration successful!');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error(data.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      toast.dismiss(loadingToast);
+      toast.error(
+        error.message === 'Failed to fetch' 
+          ? 'Cannot connect to server. Please check if the server is running.'
+          : `Registration error: ${error.message}`
+      );
+    }
   };
 
   return (
@@ -94,6 +156,30 @@ const RegisterForm = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
+              required
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700">Role</label>
             <select
               name="role"
@@ -103,13 +189,13 @@ const RegisterForm = () => {
             >
               <option value="user">User</option>
               <option value="volunteer">Volunteer</option>
-              <option value="NGO">NGO</option>
+              <option value="ngo">NGO</option>
             </select>
           </div>
         </div>
 
         {/* Role-Based Details */}
-        {(formData.role === "volunteer" || formData.role === "NGO") && (
+        {(formData.role === "volunteer" || formData.role === "ngo") && (
           <div className="mt-4">
             <h3 className="text-lg font-bold text-gray-800">
               {formData.role === "volunteer" ? "Volunteer Details" : "NGO Details"}
@@ -150,7 +236,7 @@ const RegisterForm = () => {
                 </>
               )}
 
-              {formData.role === "NGO" && (
+              {formData.role === "ngo" && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Registration Number</label>
