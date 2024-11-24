@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,7 +21,45 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // ... existing submit logic ...
+    const loadingToast = toast.loading('Logging in...');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the token in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', data.role);
+        
+        toast.dismiss(loadingToast);
+        toast.success('Login successful!');
+
+        // Redirect based on user role
+        if (data.role === 'ngo') {
+          navigate('/dashboard');
+        } else if (data.role === 'volunteer') {
+          navigate('/report-incident');
+        } else {
+          navigate('/report-incident'); // Default redirect for regular users
+        }
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.dismiss(loadingToast);
+      toast.error('An error occurred during login');
+    }
   };
 
   return (
@@ -57,14 +97,12 @@ const LoginForm = () => {
             />
           </div>
         </div>
-        <Link to="/report-incident">
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
         >
           Login
         </button>
-        </Link>
       </form>
     </div>
     <Footer/>
