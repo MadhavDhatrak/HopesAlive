@@ -3,8 +3,12 @@ import { motion } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import indianCities from '../data/indianCities';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 function ReportIncident() {
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     description: '',
     location: {
@@ -61,6 +65,56 @@ function ReportIncident() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+    const loadingToast = toast.loading('Submitting report...');
+
+    try {
+      // Create FormData object for file upload
+      const formDataToSend = new FormData();
+      
+      // Append the image file
+      if (imageFile) {
+        formDataToSend.append('animalPhoto', imageFile);
+      }
+
+      // Append other form data as JSON
+      formDataToSend.append('data', JSON.stringify({
+        description: formData.description,
+        location: formData.location,
+        animalInfo: {
+          description: formData.animalInfo.description,
+          aiSeverityAssessment: formData.animalInfo.aiSeverityAssessment
+        },
+        city: formData.city
+      }));
+
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/api/incidents/create', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formDataToSend,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.dismiss(loadingToast);
+        toast.success('Incident reported successfully!');
+        navigate('/dashboard'); // or wherever you want to redirect
+      } else {
+        throw new Error(data.message || 'Failed to submit report');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.dismiss(loadingToast);
+      toast.error(error.message || 'Failed to submit report');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
@@ -100,7 +154,7 @@ function ReportIncident() {
               </div>
             )}
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Left Column */}
                 <div className="space-y-6">
