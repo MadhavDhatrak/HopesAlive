@@ -1,6 +1,6 @@
 import { Bars3Icon } from '@heroicons/react/24/outline';
 
-function VolunteerNavbar({ onMenuClick }) {
+function VolunteerNavbar({ onMenuClick, volunteerName }) { // Ensure volunteerName is passed correctly
   return (
     <nav className="bg-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,6 +15,11 @@ function VolunteerNavbar({ onMenuClick }) {
             <div className="text-2xl font-bold text-orange-500 ml-12">
               Volunteer Dashboard
             </div>
+          </div>
+          <div className="text-lg text-gray-700 mr-12">
+            {volunteerName}! {/* This displays the logged-in volunteer's name */}
+          </div>
+          <div className="text-lg text-gray-700 mr-12">
           </div>
         </div>
       </div>

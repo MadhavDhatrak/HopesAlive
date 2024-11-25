@@ -129,7 +129,7 @@ export const getVolunteerIncidents = async (req, res) => {
         
         // Find all unassigned incidents in volunteer's city
         const incidents = await Incident.find({ 
-            city:ngoCity,
+            city: volunteerCity,
             status: "pending",
             'volunteerActivity.assignedVolunteer': { $exists: false }
         })
