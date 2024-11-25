@@ -129,11 +129,12 @@ export const getVolunteerIncidents = async (req, res) => {
         
         // Find all unassigned incidents in volunteer's city
         const incidents = await Incident.find({ 
-            city: volunteerCity,
-            status: "pending",  // Only show pending incidents
-            assignedVolunteer: { $exists: false }  // Only show unassigned incidents
+            city:ngoCity,
+            status: "pending",
+            'volunteerActivity.assignedVolunteer': { $exists: false }
         })
-        .select('animalInfo location status createdAt description')
+        .select('animalInfo location status createdAt description user')
+        .populate('user', 'name phoneNumber')
         .populate('assignedNGO', 'name phoneNumber')
         .sort('-createdAt');
 

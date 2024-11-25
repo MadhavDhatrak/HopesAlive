@@ -39,7 +39,6 @@ const VolunteerDashboard = () => {
   return (
     <VolunteerDashboardLayout>
       <h1 className="text-2xl font-bold mb-6">Volunteer Dashboard</h1>
-      <ActivitySummary stats={activityStats} />
       <IncidentList incidents={incidents} />
       <NotificationsList notifications={notifications} />
     </VolunteerDashboardLayout>

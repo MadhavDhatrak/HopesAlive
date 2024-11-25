@@ -12,9 +12,14 @@ import LoginForm from './pages/Login';
 import ReportIncident from './pages/ReportIncident';
 import Dashboard from './pages/Dashboard';
 import VolunteerDashboard from './pages/VolunteerDashboard';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
-     <Router>
+    <>
+      <ToastContainer position="top-right" />
+      <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterForm/>}/>
@@ -23,9 +28,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard/>}/>
           <Route path="/Voldash" element={<VolunteerDashboard/>}/>
         </Routes>
-     </Router>
-
-     
+      </Router>
+    </>
   )
 }
 
