@@ -135,6 +135,10 @@ const RecentIncidents = () => {
                     <span className="font-medium">Contact:</span> {incident.reporterInfo?.contactNumber}
                   </p>
                   <p className="text-sm">
+                    <span className="font-medium">Volunteer:</span>{' '}
+                    {incident.volunteerActivity?.assignedVolunteer?.name || 'No Volunteer Assigned'}
+                  </p>
+                  <p className="text-sm">
                     <span className="font-medium">Date:</span> {
                       new Date(incident.createdAt).toLocaleString('en-US', {
                         day: 'numeric',

@@ -84,6 +84,7 @@ export const getAllIncidents = async (req, res) => {
         })
         .select('animalInfo location status createdAt assignedNGO user')
         .populate('user', 'name email phoneNumber')
+        .populate('volunteerActivity.assignedVolunteer', 'name phoneNumber email')
         .sort('-createdAt');
         
         console.log('Current NGO ID:', ngoId);
