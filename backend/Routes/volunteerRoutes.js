@@ -5,7 +5,7 @@ import {
     getIncidentDetails,
     updateVolunteerStatus,
     getVolunteerNotifications,
-    getVolunteerIncidents
+    getVolunteerIncidents,
 } from '../Controllers/volunteerController.js';
 // import Incident from '../Models/Incident.js';
 import Incident from '../models/Incident.js';
