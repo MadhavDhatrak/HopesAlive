@@ -1,39 +1,94 @@
-import { BellIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
-function Navbar({ onMenuClick }) {
+const Navbar = () => {
+  const [ngoName, setNgoName] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchNgoProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          toast.error('Please login again');
+          navigate('/login');
+          return;
+        }
+
+        console.log('Token:', token);
+
+        const response = await axios.get('http://localhost:3000/api/ngo/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('Profile Response:', response.data);
+
+        if (response.data && response.data.success) {
+          setNgoName(response.data.name);
+          toast.success('Welcome ' + response.data.name);
+        }
+      } catch (error) {
+        console.error('Error details:', error.response || error);
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
+        toast.error('Failed to load NGO profile');
+      }
+    };
+
+    fetchNgoProfile();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
+
   return (
     <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <button
-              onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900"
-            >
-              <Bars3Icon className="h-6 w-6" />
-            </button>
-            <div className="text-2xl font-bold text-orange-500 ml-12 text-center">
-              CarePaws NGO
-            </div>
+            <span className="text-xl font-semibold text-gray-800 ml-10">
+              Animal Rescue Dashboard
+            </span>
           </div>
-
-          <div className="flex items-center gap-4">
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <BellIcon className="h-6 w-6 text-gray-600" />
+          
+          <div className="flex items-center space-x-4">
+            {ngoName && (
+              <div className="flex items-center mr-30 gap-2">
+                <span className="text-gray-600">Welcome,</span>
+                <span className="font-medium text-blue-600">{ngoName}</span>
+              </div>
+            )}
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              <svg 
+                className="h-4 w-4 mr-2" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
             </button>
-            <div className="flex items-center gap-2">
-              <img
-                className="h-8 w-8 rounded-full"
-                src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/85ae5d63-0227-467e-8410-48d0295deda3/dgditqz-ba17bf12-4460-45cd-8957-5f499bca2789.jpg/v1/fill/w_894,h_894,q_70,strp/___ai_art____this_page_is_for_character_inspo_by_lordkai17_dgditqz-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTAyNCIsInBhdGgiOiJcL2ZcLzg1YWU1ZDYzLTAyMjctNDY3ZS04NDEwLTQ4ZDAyOTVkZWRhM1wvZGdkaXRxei1iYTE3YmYxMi00NDYwLTQ1Y2QtODk1Ny01ZjQ5OWJjYTI3ODkuanBnIiwid2lkdGgiOiI8PTEwMjQifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.R7oTFwShDtqptQ-A5ur6uyvnDM1umaoL9uuKuUKyu9o"
-                alt="Profile"
-              />
-              <span className="hidden md:block text-gray-700">John Doe</span>
-            </div>
           </div>
         </div>
       </div>
     </nav>
   );
-}
+};
 
 export default Navbar;

@@ -67,9 +67,7 @@ const RecentIncidents = () => {
         `http://localhost:3000/api/ngo/incidents/${incidentId}/update`,
         {
           status: newStatus,
-          status_update: `Status updated to ${newStatus}`,
-          resources_needed: [], // Add empty arrays if not updating resources
-          resources_provided: []
+          status_update: `Status updated to ${newStatus} by NGO`,
         },
         {
           headers: {
@@ -79,12 +77,12 @@ const RecentIncidents = () => {
         }
       );
 
-      if (response.data && response.data.data) {
-        // Update the local state with the returned updated incident
+      if (response.data.success) {
+        // Update the local state
         setIncidents(prevIncidents =>
           prevIncidents.map(incident =>
             incident._id === incidentId
-              ? { ...incident, ...response.data.data }
+              ? { ...incident, status: newStatus }
               : incident
           )
         );
@@ -92,7 +90,7 @@ const RecentIncidents = () => {
       }
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error(error.response?.data?.message || 'Failed to update status');
+      toast.error('Failed to update status');
     } finally {
       setUpdatingStatus(null);
     }
@@ -112,7 +110,7 @@ const RecentIncidents = () => {
             ${incident.status === 'resolved' ? 'bg-green-500' : 
               incident.status === 'in progress' ? 'bg-yellow-500' : 
               'bg-red-500'} text-white`}
-          value={incident.status || 'pending'}
+          value={incident.status}
           onChange={(e) => handleStatusUpdate(incident._id, e.target.value)}
           disabled={updatingStatus === incident._id}
         >

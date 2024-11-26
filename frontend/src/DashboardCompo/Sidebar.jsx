@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   HomeIcon,
   ClipboardDocumentListIcon,
@@ -9,34 +9,46 @@ import {
 
 function Sidebar({ isOpen }) {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const menuItems = [
     {
       title: 'Dashboard',
       icon: <HomeIcon className="w-6 h-6" />,
-      path: '/dashboard'
+      path: '/dashboard',
+      status: 'active'
     },
     {
       title: 'Incidents',
       icon: <ClipboardDocumentListIcon className="w-6 h-6" />,
-      path: '/dashboard/incidents'
+      path: '/dashboard/incidents',
+      status: 'active'
     },
     {
       title: 'Notifications',
       icon: <BellIcon className="w-6 h-6" />,
-      path: '/dashboard/notifications'
+      path: '/dashboard/notifications',
+      status: 'active'
     },
     {
       title: 'Analytics',
       icon: <ChartBarIcon className="w-6 h-6" />,
-      path: '/dashboard/analytics'
+      path: '/dashboard/analytics',
+      status: 'coming-soon'
     },
     {
       title: 'Settings',
       icon: <Cog6ToothIcon className="w-6 h-6" />,
-      path: '/dashboard/settings'
+      path: '/dashboard/settings',
+      status: 'under-development'
     }
   ];
+
+  const handleItemClick = (item) => {
+    if (item.status !== 'active') {
+      navigate(`${item.path}?maintenance=true&title=${item.title}`);
+    }
+  };
 
   return (
     <aside className={`
@@ -64,20 +76,23 @@ function Sidebar({ isOpen }) {
             const isActive = location.pathname === item.path;
             
             return (
-              <Link
+              <div
                 key={item.title}
-                to={item.path}
+                onClick={() => item.status !== 'active' && handleItemClick(item)}
                 className={`
-                  flex items-center gap-4 px-4 py-3 rounded-lg
+                  flex items-center px-4 py-3 rounded-lg cursor-pointer
                   transition-colors duration-200
-                  ${isActive 
-                    ? 'bg-orange-50 text-orange-600' 
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                  ${isActive ? 'bg-orange-50 text-orange-600' : 'text-gray-900'}
+                  ${item.status === 'active' 
+                    ? 'hover:bg-gray-50 hover:text-gray-900' 
+                    : 'opacity-60 hover:bg-gray-50'}
                 `}
               >
-                {item.icon}
-                <span className="font-medium">{item.title}</span>
-              </Link>
+                <div className="flex items-center gap-4">
+                  {item.icon}
+                  <span className="font-medium">{item.title}</span>
+                </div>
+              </div>
             );
           })}
         </div>

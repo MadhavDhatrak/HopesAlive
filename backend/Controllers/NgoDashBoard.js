@@ -1,5 +1,6 @@
 import Incident from '../Models/incidentModel.js';
 import Notification from '../Models/notificationModel.js';
+import User from '../Models/userModel.js';
 
 // Get NGO Dashboard Overview
 export const getDashboardOverview = async (req, res) => {
@@ -7,65 +8,29 @@ export const getDashboardOverview = async (req, res) => {
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
 
-        // First, find all incidents in the city
-        const allCityIncidents = await Incident.find({ 
-            city: ngoCity 
-        });
-        
-        // Then find incidents assigned to this NGO
-        const ngoIncidents = await Incident.find({ 
-            city: ngoCity,
-            assignedNGO: ngoId
+        // Find all incidents assigned to this NGO
+        const incidents = await Incident.find({ 
+            assignedNGO: ngoId,
+            city: ngoCity
         });
 
         // Calculate statistics
         const stats = {
-            total: ngoIncidents.length,
-            critical: ngoIncidents.filter(inc => 
-                inc.animalInfo?.aiSeverityAssessment?.category === 'HIGH'
+            total: incidents.length,
+            critical: incidents.filter(inc => 
+                inc.animalInfo?.aiSeverityAssessment?.score >= 7
             ).length,
-            pending: ngoIncidents.filter(inc => inc.status === 'pending').length,
-            inProgress: ngoIncidents.filter(inc => inc.status === 'in progress').length,
-            resolved: ngoIncidents.filter(inc => inc.status === 'resolved').length
+            pending: incidents.filter(inc => inc.status === 'pending').length,
+            resolved: incidents.filter(inc => inc.status === 'resolved').length
         };
 
-        // Get 5 most recent incidents with volunteer information
-        const recentIncidents = await Incident.find({ 
-            city: ngoCity,
-            assignedNGO: ngoId
-        })
-        .select('animalInfo location status createdAt volunteerActivity')
-        .populate('volunteerActivity.assignedVolunteer', 'name phoneNumber')
-        .sort('-createdAt')
-        .limit(5);
-
-        // Enhanced debug information
-        console.log('Dashboard Overview Debug:', {
-            ngoId,
-            ngoCity,
-            totalCityIncidents: allCityIncidents.length,
-            ngoAssignedIncidents: ngoIncidents.length,
-            sampleIncident: allCityIncidents[0] ? {
-                id: allCityIncidents[0]._id,
-                city: allCityIncidents[0].city,
-                assignedNGO: allCityIncidents[0].assignedNGO
-            } : null
-        });
-
         res.json({
+            success: true,
             stats,
-            recentIncidents,
             debug: {
                 ngoId,
                 ngoCity,
-                totalCityIncidents: allCityIncidents.length,
-                ngoAssignedIncidents: ngoIncidents.length,
-                sampleIncidentAssignment: allCityIncidents[0] ? {
-                    id: allCityIncidents[0]._id,
-                    city: allCityIncidents[0].city,
-                    assignedNGO: allCityIncidents[0].assignedNGO,
-                    volunteerInfo: allCityIncidents[0].volunteerActivity
-                } : null
+                totalIncidents: incidents.length
             }
         });
     } catch (error) {
@@ -204,6 +169,35 @@ export const getNotifications = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const getNgoProfile = async (req, res) => {
+    try {
+        const ngoId = req.user._id;
+        const ngo = await User.findById(ngoId).select('name email city phoneNumber');
+        
+        if (!ngo) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "NGO not found" 
+            });
+        }
+
+        res.json({
+            success: true,
+            name: ngo.name,
+            email: ngo.email,
+            city: ngo.city,
+            phoneNumber: ngo.phoneNumber
+        });
+    } catch (error) {
+        console.error('Error fetching NGO profile:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
     }
 };
 
