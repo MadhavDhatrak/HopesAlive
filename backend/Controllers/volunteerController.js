@@ -3,7 +3,7 @@
 
 import Incident from '../models/Incident.js';
 import Notification from '../models/Notification.js';
-
+import User from '../Models/userModel.js';
 // Get incident details for volunteer
 export const getIncidentDetails = async (req, res) => {
     try {
@@ -41,51 +41,53 @@ export const getIncidentDetails = async (req, res) => {
 // Update volunteer status for an incident
 export const updateVolunteerStatus = async (req, res) => {
     try {
-        const { incident_id } = req.params;
-        const { volunteer_status } = req.body;
-        const volunteer_id = req.user._id;
-        const volunteerCity = req.user.city;
+        const incidentId = req.params.incident_id;
+        const volunteerId = req.user._id;
 
-        console.log("Updating status for volunteer:", volunteer_id); // Debug log
+        // First fetch the volunteer details
+        const volunteer = await User.findById(volunteerId).select('name phoneNumber email');
 
-        const incident = await Incident.findOne({
-            _id: incident_id,
-            city: volunteerCity
-        });
-        
-        if (!incident) {
-            return res.status(404).json({ message: "Incident not found or not accessible in your city" });
+        const updatedIncident = await Incident.findByIdAndUpdate(
+            incidentId,
+            {
+                $set: {
+                    'volunteerActivity.assignedVolunteer': volunteerId,
+                    'volunteerActivity.status': 'ASSIGNED',
+                    'volunteerActivity.assignedAt': new Date(),
+                    'volunteerActivity.lastUpdate': new Date(),
+                    'status': 'in progress' // Update main incident status
+                }
+            },
+            { new: true }
+        ).populate('volunteerActivity.assignedVolunteer', 'name phoneNumber email');
+
+        if (!updatedIncident) {
+            return res.status(404).json({ message: 'Incident not found' });
         }
 
-        // Update the volunteerActivity object instead of volunteer_status
-        incident.volunteerActivity = {
-            assignedVolunteer: volunteer_id,
-            status: mapVolunteerStatus(volunteer_status), // Convert status to match enum
-            assignedAt: incident.volunteerActivity?.assignedAt || new Date(),
-            lastUpdate: new Date()
-        };
-
-        await incident.save();
-
-        // Create a notification
-        const notification = new Notification({
-            recipient: volunteer_id,
-            type: 'CASE_UPDATE',
-            message: `Volunteer status updated to ${volunteer_status}`,
-            incident: incident_id,
-            createdAt: new Date(),
-            isRead: false
+        // Add a case update
+        updatedIncident.caseUpdates.push({
+            timestamp: new Date(),
+            updateType: 'VOLUNTEER_UPDATE',
+            description: `Volunteer ${volunteer.name} assigned to the incident`,
+            updatedBy: volunteerId
         });
 
-        await notification.save();
+        await updatedIncident.save();
 
-        res.status(200).json({ 
-            message: "Status updated successfully",
-            status: volunteer_status,
-            volunteerActivity: incident.volunteerActivity
+        // Debug logging
+        console.log('Updated incident with volunteer:', {
+            id: updatedIncident._id,
+            volunteerName: updatedIncident.volunteerActivity?.assignedVolunteer?.name,
+            status: updatedIncident.volunteerActivity?.status
+        });
+
+        res.json({ 
+            message: 'Status updated successfully',
+            incident: updatedIncident
         });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error updating volunteer status:', error);
         res.status(500).json({ message: error.message });
     }
 };

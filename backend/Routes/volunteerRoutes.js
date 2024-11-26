@@ -9,6 +9,7 @@ import {
 } from '../Controllers/volunteerController.js';
 // import Incident from '../Models/Incident.js';
 import Incident from '../models/Incident.js';
+import User from '../Models/userModel.js';
 
 const router = express.Router();
 
@@ -31,6 +32,25 @@ router.get('/my-assignments', protectedRoute, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+
+  // Add this after the existing routes
+router.get('/:id', protectedRoute, async (req, res) => {
+  try {
+    const volunteer = await User.findOne({ 
+      _id: req.params.id,
+      role: 'volunteer'
+    }).select('name email phoneNumber');
+
+    if (!volunteer) {
+      return res.status(404).json({ message: 'Volunteer not found' });
+    }
+
+    res.json(volunteer);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 });
 
 export default router;

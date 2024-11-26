@@ -1,25 +1,52 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const RecentIncidents = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
 
   useEffect(() => {
     const fetchIncidents = async () => {
       try {
-        // Get token from localStorage
         const token = localStorage.getItem('token');
-        
+        // First fetch incidents
         const response = await axios.get('http://localhost:3000/api/incidents', {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
-        console.log('Incident data:', response.data);
-        setIncidents(response.data);
+        // For each incident that has an assigned volunteer, fetch volunteer details
+        const incidentsWithVolunteers = await Promise.all(response.data.map(async (incident) => {
+          if (incident.volunteerActivity?.assignedVolunteer) {
+            try {
+              const volunteerResponse = await axios.get(
+                `http://localhost:3000/api/volunteer/${incident.volunteerActivity.assignedVolunteer}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                }
+              );
+              return {
+                ...incident,
+                volunteerActivity: {
+                  ...incident.volunteerActivity,
+                  volunteerDetails: volunteerResponse.data
+                }
+              };
+            } catch (err) {
+              console.error('Error fetching volunteer details:', err);
+              return incident;
+            }
+          }
+          return incident;
+        }));
+        
+        setIncidents(incidentsWithVolunteers);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching incidents:', err);
@@ -30,6 +57,72 @@ const RecentIncidents = () => {
 
     fetchIncidents();
   }, []);
+
+  const handleStatusUpdate = async (incidentId, newStatus) => {
+    try {
+      setUpdatingStatus(incidentId);
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.put(
+        `http://localhost:3000/api/ngo/incidents/${incidentId}/update`,
+        {
+          status: newStatus,
+          status_update: `Status updated to ${newStatus}`,
+          resources_needed: [], // Add empty arrays if not updating resources
+          resources_provided: []
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data && response.data.data) {
+        // Update the local state with the returned updated incident
+        setIncidents(prevIncidents =>
+          prevIncidents.map(incident =>
+            incident._id === incidentId
+              ? { ...incident, ...response.data.data }
+              : incident
+          )
+        );
+        toast.success('Status updated successfully');
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error(error.response?.data?.message || 'Failed to update status');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const renderActionButtons = (incident) => (
+    <div className="flex gap-2">
+      <button 
+        className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors"
+        onClick={() => {/* Add view details handler */}}
+      >
+        View Details
+      </button>
+      <div className="flex-1">
+        <select
+          className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors
+            ${incident.status === 'resolved' ? 'bg-green-500' : 
+              incident.status === 'in progress' ? 'bg-yellow-500' : 
+              'bg-red-500'} text-white`}
+          value={incident.status || 'pending'}
+          onChange={(e) => handleStatusUpdate(incident._id, e.target.value)}
+          disabled={updatingStatus === incident._id}
+        >
+          <option value="pending">Pending</option>
+          <option value="in progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -113,6 +206,7 @@ const RecentIncidents = () => {
                   <span>{incident.location?.address}</span>
                 </div>
               </div>
+              
 
               {/* Status */}
               <div className="mb-4">
@@ -134,9 +228,11 @@ const RecentIncidents = () => {
                   <p className="text-sm">
                     <span className="font-medium">Contact:</span> {incident.reporterInfo?.contactNumber}
                   </p>
+                
                   <p className="text-sm">
                     <span className="font-medium">Volunteer:</span>{' '}
-                    {incident.volunteerActivity?.assignedVolunteer?.name || 'No Volunteer Assigned'}
+                    {incident.volunteerActivity?.volunteerDetails?.name || 
+                     (incident.volunteerActivity?.status === 'ASSIGNED' ? 'Assigned ' : 'No Volunteer Assigned')}
                   </p>
                   <p className="text-sm">
                     <span className="font-medium">Date:</span> {
@@ -153,14 +249,7 @@ const RecentIncidents = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
-                <button className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
-                  View Details
-                </button>
-                <button className="flex-1 px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 transition-colors">
-                  Mark Resolved
-                </button>
-              </div>
+              {renderActionButtons(incident)}
             </div>
           </div>
         ))}

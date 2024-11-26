@@ -29,12 +29,13 @@ export const getDashboardOverview = async (req, res) => {
             resolved: ngoIncidents.filter(inc => inc.status === 'resolved').length
         };
 
-        // Get 5 most recent incidents
+        // Get 5 most recent incidents with volunteer information
         const recentIncidents = await Incident.find({ 
             city: ngoCity,
             assignedNGO: ngoId
         })
-        .select('animalInfo location status createdAt')
+        .select('animalInfo location status createdAt volunteerActivity')
+        .populate('volunteerActivity.assignedVolunteer', 'name phoneNumber')
         .sort('-createdAt')
         .limit(5);
 
@@ -62,7 +63,8 @@ export const getDashboardOverview = async (req, res) => {
                 sampleIncidentAssignment: allCityIncidents[0] ? {
                     id: allCityIncidents[0]._id,
                     city: allCityIncidents[0].city,
-                    assignedNGO: allCityIncidents[0].assignedNGO
+                    assignedNGO: allCityIncidents[0].assignedNGO,
+                    volunteerInfo: allCityIncidents[0].volunteerActivity
                 } : null
             }
         });
@@ -78,36 +80,24 @@ export const getAllIncidents = async (req, res) => {
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
         
-        // Find all incidents in the city with user information
         const incidents = await Incident.find({ 
             city: ngoCity
         })
-        .select('animalInfo location status createdAt assignedNGO user')
+        .select('animalInfo location status createdAt assignedNGO user volunteerActivity')
         .populate('user', 'name email phoneNumber')
         .populate('volunteerActivity.assignedVolunteer', 'name phoneNumber email')
         .sort('-createdAt');
-        
-        console.log('Current NGO ID:', ngoId);
-        console.log('All incidents:', incidents.map(inc => ({
+
+        // Add debug logging
+        console.log('Incidents with volunteer info:', incidents.map(inc => ({
             id: inc._id,
-            assignedNGO: inc.assignedNGO,
-            city: inc.city,
-            reportedBy: inc.user?.name
+            volunteerInfo: inc.volunteerActivity,
+            volunteerName: inc.volunteerActivity?.assignedVolunteer?.name
         })));
 
         res.json({
             success: true,
             count: incidents.length,
-            debug: {
-                ngoId,
-                ngoCity,
-                allIncidents: incidents.map(inc => ({
-                    id: inc._id,
-                    assignedNGO: inc.assignedNGO,
-                    city: inc.city,
-                    reportedBy: inc.user
-                }))
-            },
             data: incidents
         });
     } catch (error) {
