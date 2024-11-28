@@ -1,4 +1,5 @@
 import User from "../Models/userModel.js";
+import Incident from "../Models/incidentModel.js";
 import bcrypt from "bcrypt";
 import generateToken from "../utils/gererateToken.js";
 import jwt from "jsonwebtoken";
@@ -175,3 +176,29 @@ export const getUserProfile = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+
+  export const getUserIncidents = async (req, res) => {
+    const { userId } = req.params; // Get userId from request parameters
+
+    // Validate userId
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    console.log('Fetching incidents for userId:', userId); // Log userId for debugging
+
+    try {
+        const incidents = await Incident.find({ user: userId }); // Adjusted to match the field in the Incident model
+
+        // Check if incidents were found
+        if (incidents.length === 0) {
+            return res.status(404).json({ message: 'No incidents found for this user' });
+        }
+
+        res.status(200).json({ data: incidents });
+    } catch (error) {
+        console.error('Error fetching incidents:', error);
+        res.status(500).json({ message: 'Error fetching incidents' });
+    }
+};

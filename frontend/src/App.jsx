@@ -15,6 +15,7 @@ import VolunteerDashboard from './pages/VolunteerDashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MaintenancePage from './DashboardCompo/MaintenancePage';
+import UserDashboard from './UserDashBoard/UserDashboard';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Route path="/dashboard/notifications" element={<MaintenancePage />} />
           <Route path="/dashboard/analytics" element={<MaintenancePage />} />
            <Route path="/dashboard/settings" element={<MaintenancePage />} />
+           <Route path="/user-dashboard" element={<UserDashboard />} />
         </Routes>
       </Router>
     </>

@@ -35,10 +35,13 @@ const LoginForm = () => {
 
       const data = await response.json();
 
+      console.log(data._id);
+
       if (response.ok) {
         // Store the token in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('userRole', data.role);
+        localStorage.setItem('userId',data._id);
         
         toast.dismiss(loadingToast);
         toast.success('Login successful!');

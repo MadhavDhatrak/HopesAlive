@@ -20,9 +20,7 @@ pids
 *.seed
 *.pid.lock
 
-# Directory for uploaded files
-uploads/
-public/uploads/
+
 
 # IDE / editors
 .idea/
