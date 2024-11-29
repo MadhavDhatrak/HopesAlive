@@ -5,12 +5,11 @@ function Footer() {
           <div className="grid md:grid-cols-4 gap-8">
             {/* Logo and Description */}
             <div className="col-span-2 md:col-span-1">
-              <img src="/logo-white.svg" alt="CarePaws" className="h-8 mb-4" />
+              <img src="/logo-white.svg" alt="HopesAlive" className="h-8 mb-4" />
               <p className="text-gray-400">
                 Making the world a better place for animals, one paw at a time.
               </p>
             </div>
-  
             {/* Quick Links */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
@@ -46,6 +45,7 @@ function Footer() {
                   >
                     <span className="sr-only">{social}</span>
                     {/* Add social media icons here */}
+                     
                   </a>
                 ))}
               </div>
@@ -53,7 +53,7 @@ function Footer() {
           </div>
   
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>Built with ❤️ by CarePaws Team</p>
+            <p>Built with ❤️ by HopesAlive Team</p>
           </div>
         </div>
       </footer>

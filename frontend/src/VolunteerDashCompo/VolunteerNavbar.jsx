@@ -1,6 +1,7 @@
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 
 function VolunteerNavbar({ onMenuClick }) {
   const navigate = useNavigate();
@@ -42,6 +43,12 @@ function VolunteerNavbar({ onMenuClick }) {
               </svg>
               Logout
             </button>
+             <Link to="/report-incident">
+             <button className="inline-flex items-center ml-10 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Go Back
+              </button>
+             </Link>
           </div>
         </div>
       </div>
