@@ -88,7 +88,7 @@ function Features() {
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            How CarePaws Works
+            How HopesAlive Works
           </motion.h2>
           <motion.div 
             className="w-24 h-1.5 bg-orange-500 mx-auto rounded-full"
