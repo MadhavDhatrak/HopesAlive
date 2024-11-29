@@ -1,6 +1,8 @@
 HopesAlive: Revolutionizing Animal Rescue
 HopesAlive is a dedicated platform designed to bridge the gap between citizens, volunteers, and NGOs in addressing animal emergencies. Whether it's an injured animal or an accident involving one, HopesAlive provides a streamlined solution to report, assign, and resolve incidents with efficiency and compassion.
 
+<hr>
+
 🐾 What is HopesAlive?
 HopesAlive is a web platform that empowers users to report animal-related incidents by uploading a photo and location details. The system ensures that the relevant NGOs and volunteers in the area are notified, enabling swift action. Volunteers and NGOs can manage incidents collaboratively, track statuses, and communicate seamlessly to save lives and bring aid to animals in need.
 
