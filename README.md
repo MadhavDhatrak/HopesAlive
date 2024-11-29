@@ -69,7 +69,6 @@ cd CarePaws
 ```bash 
 Create a .env file in the root directory and include the following:
 
-Copy code
 PORT=3000
 MONGO_URI=your-mongodb-link
 JWT_KEY=your-secret-key
