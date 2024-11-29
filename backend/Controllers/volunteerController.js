@@ -163,7 +163,8 @@ export const getVolunteerIncidents = async (req, res) => {
                 },
                 status: incident.status,
                 createdAt: incident.createdAt,
-                assignedNGO: incident.assignedNGO
+                assignedNGO: incident.assignedNGO,
+                user: incident.user
             }))
         });
     } catch (error) {

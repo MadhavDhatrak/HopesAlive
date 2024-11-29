@@ -182,10 +182,10 @@ function IncidentList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {incident.reporterInfo?.name || 'Anonymous'}
+                      {incident.user?.name || 'Anonymous'}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {incident.reporterInfo?.contactNumber || 'No phone'}
+                      {incident.user?.phoneNumber || 'No phone'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
