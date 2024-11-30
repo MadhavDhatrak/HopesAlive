@@ -102,5 +102,5 @@ http://localhost:5173/
 
 ## 🤝 Contributing  
 We welcome contributions! If you’d like to improve HopesAlive, please fork the repository and submit a pull request.  
-For more information, check out the [Contribution Guidelines](contribution.md).
+For more information, check out the Contribution Guidelines
 
