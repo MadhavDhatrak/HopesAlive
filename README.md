@@ -4,11 +4,16 @@
 
 ---
 
+## 🐾 Whats is the problem 
+Every day, countless animals suffer from injuries or accidents, and often, they go unnoticed or unassisted. Traditional reporting methods are limited, and there is a lack of collaboration among the public, veterinary professionals, and shelters. We need a system that not only facilitates the reporting of these incidents but also provides a way for professionals to respond effectively.
+
+
 ## 🐾 What is HopesAlive?  
 HopesAlive is a web platform that empowers users to report animal-related incidents by uploading a photo and location details. The system ensures that the relevant NGOs and volunteers in the area are notified, enabling swift action. Volunteers and NGOs can manage incidents collaboratively, track statuses, and communicate seamlessly to save lives and bring aid to animals in need.  
 
 ---
 ![Data Sources](https://github.com/user-attachments/assets/02d70237-e6d6-40cb-9ab1-39ecb68efea5)
+
 
 
 ## 🌟 The Problem We Solve  
@@ -64,8 +69,8 @@ HopesAlive solves these problems by connecting citizens, volunteers, and NGOs on
 
 ### 1. Clone the Repository  
 ```bash
-git clone https://github.com/MadhavDhatrak/CarePaws.git
-cd CarePaws
+git clone https://github.com/MadhavDhatrak/HopesAlive.git
+cd HopesAlive
 ```
 ### 2. Configure Environment Variables
 ```bash 
