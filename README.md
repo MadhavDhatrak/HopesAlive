@@ -12,7 +12,8 @@ Every day, countless animals suffer from injuries or accidents, and often, they 
 HopesAlive is a web platform that empowers users to report animal-related incidents by uploading a photo and location details. The system ensures that the relevant NGOs and volunteers in the area are notified, enabling swift action. Volunteers and NGOs can manage incidents collaboratively, track statuses, and communicate seamlessly to save lives and bring aid to animals in need.  
 
 ---
-![Data Sources](https://github.com/user-attachments/assets/02d70237-e6d6-40cb-9ab1-39ecb68efea5)
+![Data Sources (3)](https://github.com/user-attachments/assets/f5b31c25-4df9-4cb9-a1e0-c2d5acad0e53)
+
 
 
 
