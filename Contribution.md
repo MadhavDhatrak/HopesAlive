@@ -28,6 +28,7 @@ Documentation Improvements
 - Review and enhance the project documentation.
 - Ensure the README and other files are accurate and up-to-date.
 
+---
 
 **🚀 Getting Started**
 
