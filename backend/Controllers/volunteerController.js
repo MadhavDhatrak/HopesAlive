@@ -1,16 +1,14 @@
-// import Incident from '../models/Incident.js';  // You'll need to create/import these models
-// import Notification from '../Models/Notification.js';
-
-import Incident from '../models/Incident.js';
-import Notification from '../models/Notification.js';
+import IncidentVolunteer from '../Models/IncidentVolunteer.js';
 import User from '../Models/userModel.js';
-// Get incident details for volunteer
+import NotificationVolunteer from '../Models/NotificationVolunteer.js';
+
+
 export const getIncidentDetails = async (req, res) => {
     try {
         const { incident_id } = req.params;
         const volunteerCity = req.user.city;
         
-        const incident = await Incident.findOne({
+        const incident = await IncidentVolunteer.findOne({
             _id: incident_id,
             city: volunteerCity
         });
@@ -47,7 +45,7 @@ export const updateVolunteerStatus = async (req, res) => {
         // First fetch the volunteer details
         const volunteer = await User.findById(volunteerId).select('name phoneNumber email');
 
-        const updatedIncident = await Incident.findByIdAndUpdate(
+        const updatedIncident = await IncidentVolunteer.findByIdAndUpdate(
             incidentId,
             {
                 $set: {
@@ -106,22 +104,17 @@ function mapVolunteerStatus(status) {
 // Get notifications for volunteer
 export const getVolunteerNotifications = async (req, res) => {
     try {
-        const volunteer_id = req.user._id;  // Changed from req.user.id to req.user._id
+        const volunteer_id = req.user._id;  
 
-        console.log("Searching notifications for volunteer:", volunteer_id); // Debug log
-
-        const notifications = await Notification.find({
-            recipient: volunteer_id  // Changed from recipient_id to recipient
+        const notifications = await NotificationVolunteer.find({
+            recipient: volunteer_id  
         })
         .sort({ createdAt: -1 })  // Most recent first
-        .limit(20);  // Limit to last 20 notifications
-
-        console.log("Found notifications:", notifications); // Debug log
+        .limit(20);  
 
         res.status(200).json(notifications);
     } catch (error) {
-        console.log("Error fetching notifications:", error); // Debug log
-        res.status(500).json({ message: error.message });
+        console.log("Error fetching notifications:", error); 
     }
 };
 
@@ -130,7 +123,7 @@ export const getVolunteerIncidents = async (req, res) => {
         const volunteerCity = req.user.city;
         
         // Find all unassigned incidents in volunteer's city
-        const incidents = await Incident.find({ 
+        const incidents = await IncidentVolunteer.find({ 
             city: volunteerCity,
             status: "pending",
             'volunteerActivity.assignedVolunteer': { $exists: false }
@@ -164,7 +157,7 @@ export const getVolunteerIncidents = async (req, res) => {
                 status: incident.status,
                 createdAt: incident.createdAt,
                 assignedNGO: incident.assignedNGO,
-                user: incident.user
+                user: incident.user // for Getting user Info 
             }))
         });
     } catch (error) {

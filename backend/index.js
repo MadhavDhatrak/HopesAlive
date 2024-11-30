@@ -5,7 +5,7 @@ import userRoutes from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import incidentRoutes from "./routes/incidentRoutes.js";
 import ngoRoutes from "./routes/ngoRoutes.js";
-import volunteerRoutes from "./routes/volunteerRoutes.js";
+import volunteerRoutes from "./Routes/volunteerRoutes.js"; 
 import cors from "cors";
 dotenv.config();
 const app = express();

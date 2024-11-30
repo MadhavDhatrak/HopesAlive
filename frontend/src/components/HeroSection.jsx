@@ -42,7 +42,6 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* Optional: Add a subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-[1]"></div>
     </div>
   );

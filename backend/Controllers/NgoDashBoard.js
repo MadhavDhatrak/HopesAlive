@@ -172,7 +172,7 @@ export const getNotifications = async (req, res) => {
     }
 };
 
-
+// Getting data for NGO dashboard 
 export const getNgoProfile = async (req, res) => {
     try {
         const ngoId = req.user._id;

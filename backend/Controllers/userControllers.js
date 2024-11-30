@@ -1,14 +1,12 @@
 import User from "../Models/userModel.js";
 import Incident from "../Models/incidentModel.js";
 import bcrypt from "bcrypt";
-import generateToken from "../utils/gererateToken.js";
 import jwt from "jsonwebtoken";
+
 
 // Register Controller
 export const register = async (req, res) => {
   try {
-    console.log('Received registration request:', req.body);
-
     const { 
       name, 
       email, 
@@ -117,7 +115,7 @@ export const login = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            token: token  // This is your Bearer token
+            token: token  
         });
 
     } catch (error) {
@@ -186,11 +184,8 @@ export const getUserProfile = async (req, res) => {
         return res.status(400).json({ message: 'User ID is required' });
     }
 
-    console.log('Fetching incidents for userId:', userId); // Log userId for debugging
-
     try {
-        const incidents = await Incident.find({ user: userId }); // Adjusted to match the field in the Incident model
-
+        const incidents = await Incident.find({ user: userId }); 
         // Check if incidents were found
         if (incidents.length === 0) {
             return res.status(404).json({ message: 'No incidents found for this user' });

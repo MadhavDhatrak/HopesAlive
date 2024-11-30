@@ -28,4 +28,6 @@ const incidentSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.models.Incident || mongoose.model('Incident', incidentSchema); 
+
+const IncidentVolunteer=mongoose.model("IncidentVolunteer",incidentSchema)
+ export default IncidentVolunteer;

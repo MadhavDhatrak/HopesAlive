@@ -7,13 +7,12 @@ import {
     getVolunteerNotifications,
     getVolunteerIncidents,
 } from '../Controllers/volunteerController.js';
-// import Incident from '../Models/Incident.js';
-import Incident from '../models/Incident.js';
+// import Incident from '../models/Incident.js';
+import IncidentVolunteer from '../Models/IncidentVolunteer.js';
 import User from '../Models/userModel.js';
 
 const router = express.Router();
 
-// Volunteer dashboard routes
 router.get('/incidents/:incident_id', protectedRoute, getIncidentDetails);
 router.put('/incidents/:incident_id/volunteer/update',protectedRoute, updateVolunteerStatus);
 router.get('/notifications', protectedRoute, getVolunteerNotifications);
@@ -21,7 +20,7 @@ router.get('/incidents', protectedRoute, requireVolunteerRole, getVolunteerIncid
 router.get('/my-assignments', protectedRoute, async (req, res) => {
   try {
     const volunteerId = req.user._id;
-    const assignedIncidents = await Incident.find({
+    const assignedIncidents = await IncidentVolunteer.find({
       'volunteerActivity.assignedVolunteer': volunteerId
     });
     
@@ -33,7 +32,6 @@ router.get('/my-assignments', protectedRoute, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 
-  // Add this after the existing routes
 router.get('/:id', protectedRoute, async (req, res) => {
   try {
     const volunteer = await User.findOne({ 
