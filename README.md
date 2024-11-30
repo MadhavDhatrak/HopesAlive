@@ -69,8 +69,8 @@ HopesAlive solves these problems by connecting citizens, volunteers, and NGOs on
 
 ### 1. Clone the Repository  
 ```bash
-git clone https://github.com/MadhavDhatrak/CarePaws.git
-cd CarePaws
+git clone https://github.com/MadhavDhatrak/HopesAlive.git
+cd HopesAlive
 ```
 ### 2. Configure Environment Variables
 ```bash 
