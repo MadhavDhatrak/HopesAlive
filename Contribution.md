@@ -37,7 +37,7 @@ Fork the Repository
 
 *Clone Your Fork*
 ```bash
--git clone https://github.com/your-username/HopesAlive.git
+-git clone https://github.com/MadhavDhatrak/HopesAlive.git
 -cd HopesAlive
 ```
 ---
