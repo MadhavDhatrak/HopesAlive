@@ -11,7 +11,7 @@ function Features() {
       description: "Simple incident reporting system with real-time updates and location tracking",
       color: "from-orange-500/10 to-orange-500/5",
       iconColor: "text-orange-600",
-      link: "/report"
+      link: "/report-incident"
     },
     {
       icon: <FaHandsHelping className="w-6 h-6" />,

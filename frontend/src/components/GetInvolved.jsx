@@ -48,7 +48,7 @@ function GetInvolved() {
                 Spotted an animal in distress? Your quick action could save a life. 
                 Our team will respond promptly to help the animal in need.
               </p>
-              <Link to="/report">
+              <Link to="/report-incident">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
