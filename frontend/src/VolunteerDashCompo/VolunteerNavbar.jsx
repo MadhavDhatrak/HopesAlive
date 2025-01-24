@@ -14,41 +14,53 @@ function VolunteerNavbar({ onMenuClick }) {
 
   return (
     <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between h-16">
+          {/* Left side */}
           <div className="flex items-center">
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 lg:hidden"
             >
               <Bars3Icon className="h-6 w-6" />
             </button>
-            <div className="text-2xl font-bold text-orange-500 ml-12">
-              Volunteer Dashboard
+            <div className="hidden lg:flex items-center ml-4">
+              <span className="text-xl font-semibold text-orange-500">
+                Volunteer Dashboard
+              </span>
+            </div>
+            {/* Mobile title */}
+            <div className="lg:hidden flex items-center ml-2">
+              <span className="text-lg font-semibold text-orange-500">
+                Volunteer
+              </span>
             </div>
           </div>
-          
-          <div className="flex items-center">
+
+          {/* Right side */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Link 
+              to="/report-incident"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            >
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Home</span>
+            </Link>
+            
             <button
               onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
             >
               <svg 
-                className="h-4 w-4 mr-2" 
+                className="h-4 w-4 sm:mr-2" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </button>
-             <Link to="/report-incident">
-             <button className="inline-flex items-center ml-10 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Go Back
-              </button>
-             </Link>
           </div>
         </div>
       </div>
