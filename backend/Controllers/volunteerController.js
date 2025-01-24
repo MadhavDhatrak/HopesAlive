@@ -1,4 +1,5 @@
 import IncidentVolunteer from '../Models/IncidentVolunteer.js';
+import Incident from '../Models/incidentModel.js';
 import User from '../Models/userModel.js';
 import NotificationVolunteer from '../Models/NotificationVolunteer.js';
 
@@ -8,7 +9,7 @@ export const getIncidentDetails = async (req, res) => {
         const { incident_id } = req.params;
         const volunteerCity = req.user.city;
         
-        const incident = await IncidentVolunteer.findOne({
+        const incident = await Incident.findOne({
             _id: incident_id,
             city: volunteerCity
         });
@@ -45,7 +46,7 @@ export const updateVolunteerStatus = async (req, res) => {
         // First fetch the volunteer details
         const volunteer = await User.findById(volunteerId).select('name phoneNumber email');
 
-        const updatedIncident = await IncidentVolunteer.findByIdAndUpdate(
+        const updatedIncident = await Incident.findByIdAndUpdate(
             incidentId,
             {
                 $set: {
@@ -122,20 +123,39 @@ export const getVolunteerIncidents = async (req, res) => {
     try {
         const volunteerCity = req.user.city;
         
-        // Find all unassigned incidents in volunteer's city
-        const incidents = await IncidentVolunteer.find({ 
+        // Debug logs
+        console.log('Volunteer Info:', {
+            id: req.user._id,
             city: volunteerCity,
-            status: "pending",
-            'volunteerActivity.assignedVolunteer': { $exists: false }
+            role: req.user.role
+        });
+
+        // First check if any incidents exist
+        const allIncidents = await Incident.find({});
+        console.log('All incidents in DB:', {
+            total: allIncidents.length,
+            cities: [...new Set(allIncidents.map(inc => inc.city))]
+        });
+
+        // Find all unassigned incidents in volunteer's city
+        const incidents = await Incident.find({ 
+            city: volunteerCity,
+            status: "pending"
         })
         .select('animalInfo location status createdAt description user')
         .populate('user', 'name phoneNumber')
-        .populate('assignedNGO', 'name phoneNumber')
         .sort('-createdAt');
 
-        console.log('Volunteer Dashboard Query:', {
+        // Debug logs
+        console.log('Query Results:', {
             city: volunteerCity,
-            foundIncidents: incidents.length
+            foundIncidents: incidents.length,
+            sampleIncident: incidents[0] ? {
+                id: incidents[0]._id,
+                city: incidents[0].city,
+                status: incidents[0].status,
+                description: incidents[0].description
+            } : null
         });
 
         res.json({
@@ -149,20 +169,22 @@ export const getVolunteerIncidents = async (req, res) => {
             data: incidents.map(incident => ({
                 id: incident._id,
                 location: incident.location,
-                animalInfo: {
-                    description: incident.animalInfo.description,
-                    photo: incident.animalInfo.photo,
-                    severity: incident.animalInfo.aiSeverityAssessment
-                },
+                animalInfo: incident.animalInfo,
                 status: incident.status,
                 createdAt: incident.createdAt,
-                assignedNGO: incident.assignedNGO,
-                user: incident.user // for Getting user Info 
+                user: incident.user
             }))
         });
     } catch (error) {
         console.error('Error in getVolunteerIncidents:', error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message,
+            debug: {
+                error: error.toString(),
+                stack: error.stack
+            }
+        });
     }
 };
 

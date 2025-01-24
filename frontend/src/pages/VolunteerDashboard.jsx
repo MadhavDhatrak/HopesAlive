@@ -7,34 +7,74 @@ import VolunteerDashboardLayout from '../VolunteerDashCompo/VolunteerDashboardLa
 import IncidentList from '../VolunteerDashCompo/IncidentList';
 import ActivitySummary from '../VolunteerDashCompo/ActivitySummary';
 import NotificationsList from '../VolunteerDashCompo/NotificationsList';
+import axios from 'axios';
 
 const VolunteerDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [activityStats, setActivityStats] = useState({});
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch incidents, activity stats, and notifications from your API
     const fetchData = async () => {
       try {
-        const incidentsResponse = await fetch('/api/volunteer/incidents');
-        const statsResponse = await fetch('/api/volunteer/activity-stats');
-        const notificationsResponse = await fetch('/api/volunteer/notifications');
+        const token = localStorage.getItem('token');
+        console.log('Using token:', token?.substring(0, 20) + '...');
 
-        const incidentsData = await incidentsResponse.json();
-        const statsData = await statsResponse.json();
-        const notificationsData = await notificationsResponse.json();
+        const response = await axios.get('http://localhost:3000/api/volunteer/incidents', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
-        setIncidents(incidentsData);
-        setActivityStats(statsData);
-        setNotifications(notificationsData);
+        console.log('Full API Response:', response.data);
+        
+        if (response.data.success) {
+          setIncidents(response.data.data);
+          console.log('Set incidents:', response.data.data);
+        }
+
+        // Fetch notifications
+        const notificationsResponse = await axios.get(
+          'http://localhost:3000/api/volunteer/notifications',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (notificationsResponse.data) {
+          setNotifications(notificationsResponse.data);
+        }
+
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Fetch error:', error.response || error);
+        setError(error.message);
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <VolunteerDashboardLayout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        </div>
+      </VolunteerDashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <VolunteerDashboardLayout>
+        <div className="text-red-500 text-center p-4">
+          Error: {error}
+        </div>
+      </VolunteerDashboardLayout>
+    );
+  }
 
   return (
     <VolunteerDashboardLayout>

@@ -1,33 +1,43 @@
 import mongoose from 'mongoose';
 
-const incidentSchema = new mongoose.Schema({
-    animal_photo: String,
-    animal_description: String,
+const incidentVolunteerSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
     location: {
-        type: { type: String },
+        type: {
+            type: String,
+            default: 'Point'
+        },
         coordinates: [Number],
         address: String
     },
-    severity: {
+    animalInfo: {
+        description: String,
+        photo: String,
+        aiSeverityAssessment: {
+            score: Number,
+            category: String,
+            assessmentDetails: String
+        }
+    },
+    status: {
         type: String,
-        enum: ['Low', 'Medium', 'High']
+        enum: ['pending', 'assigned', 'in-progress', 'completed'],
+        default: 'pending'
     },
-    required_actions: [String],
-    volunteer_status: {
-        type: String,
-        enum: ['On the way', 'Arrived', 'Animal rescued', 'Completed']
-    },
-    volunteer_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    last_updated: Date,
-    created_at: {
+    description: String,
+    createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-
-const IncidentVolunteer=mongoose.model("IncidentVolunteer",incidentSchema)
- export default IncidentVolunteer;
+const IncidentVolunteer = mongoose.model('IncidentVolunteer', incidentVolunteerSchema);
+export default IncidentVolunteer;
