@@ -2,6 +2,7 @@ import User from "../Models/userModel.js";
 import Incident from "../Models/incidentModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import generateToken from '../utils/generateToken.js';
 
 // Register Controller
 export const register = async (req, res) => {
@@ -54,15 +55,15 @@ export const register = async (req, res) => {
 
     // Add role-specific details if they exist
     if (role === "volunteer") {
-      // Create user but mark as pending document signing
       userData.status = "pending_documents";
       userData.volunteerDetails = volunteerDetails;
       
-      // Create the user first
       const newUser = await User.create(userData);
+      const token = generateToken(newUser._id);
       
       return res.status(201).json({
         _id: newUser._id,
+        token,
         requiresDocuments: true,
         message: "Please complete document signing",
       });
@@ -74,7 +75,7 @@ export const register = async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(user._id);
-
+    console.log("Token:", token); // Debug log
     res.status(201).json({
       _id: user._id,
       name: user.name,

@@ -97,14 +97,18 @@ const RegisterForm = () => {
   };
 
   const handleRegistrationSuccess = (data) => {
-    if (data.requiresDocuments) {
-      // Show document signing component
-      setShowDocuments(true);
-      setUserData(data);
-    } else {
-      navigate('/volunteer/dashboard');
+    // Store the token immediately when received
+    if (data.token) {
+        localStorage.setItem('token', data.token);
     }
-  };
+    
+    if (data.requiresDocuments) {
+        setShowDocuments(true);
+        setUserData(data);
+    } else {
+        navigate('/volunteer/dashboard');
+    }
+};
 
   return (
      <>
