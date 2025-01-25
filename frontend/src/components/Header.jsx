@@ -151,13 +151,13 @@ function Header() {
                     Login
                   </motion.button>
                 </Link>
-                <Link to="/report-incident">
+                <Link to="/register">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
                   >
-                    Report Now
+                    Register
                   </motion.button>
                 </Link>
               </>

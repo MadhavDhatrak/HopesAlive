@@ -7,6 +7,7 @@ import incidentRoutes from "./Routes/incidentRoutes.js";
 import ngoRoutes from "./Routes/NgoRoutes.js";
 import volunteerRoutes from "./Routes/volunteerRoutes.js"; 
 import cors from "cors";
+import docuSignRoutes from './Routes/docuSignRoutes.js';
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
@@ -27,6 +28,7 @@ app.use("/api/incidents",incidentRoutes);
 app.use("/api/ngo",ngoRoutes);
 app.use("/api/volunteer",volunteerRoutes);
 app.use("/api/uploads", express.static("uploads"));
+app.use('/api/docusign', docuSignRoutes);
 
 app.listen(port, () => {
     connectDB();
