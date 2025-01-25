@@ -1,10 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/ConnectDB.js";
-import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "./Routes/userRoutes.js";
 import cookieParser from "cookie-parser";
-import incidentRoutes from "./routes/incidentRoutes.js";
-import ngoRoutes from "./routes/ngoRoutes.js";
+import incidentRoutes from "./Routes/incidentRoutes.js";
+import ngoRoutes from "./Routes/NgoRoutes.js";
 import volunteerRoutes from "./Routes/volunteerRoutes.js"; 
 import cors from "cors";
 dotenv.config();

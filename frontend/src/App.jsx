@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import HomePage from './pages/HomePage';
 import RegisterForm from './pages/Register';
 import {
@@ -6,8 +5,6 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import './App.css'
 import LoginForm from './pages/Login';
 import ReportIncident from './pages/ReportIncident';
 import Dashboard from './pages/Dashboard';

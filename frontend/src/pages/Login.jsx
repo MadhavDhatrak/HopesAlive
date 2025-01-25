@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -21,15 +21,15 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loadingToast = toast.loading('Logging in...');
+    const loadingToast = toast.loading("Logging in...");
 
     try {
-      const response = await fetch('http://localhost:3000/api/users/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/api/users/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -39,76 +39,83 @@ const LoginForm = () => {
 
       if (response.ok) {
         // Store the token in localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userRole', data.role);
-        localStorage.setItem('userId',data._id);
-        
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userName", data.name);
+        localStorage.setItem("userRole", data.role);
+        localStorage.setItem("userId", data._id);
+
         toast.dismiss(loadingToast);
-        toast.success('Login successful!');
+        toast.success("Login successful!");
 
         // Redirect based on user role
-        if (data.role === 'ngo') {
-          navigate('/dashboard');
-        } else if (data.role === 'volunteer') {
-          navigate('/report-incident');
+        if (data.role === "ngo") {
+          navigate("/dashboard");
+        } else if (data.role === "volunteer") {
+          navigate("/report-incident");
         } else {
-          navigate('/report-incident'); // Default redirect for regular users
+          navigate("/report-incident"); // Default redirect for regular users
         }
       } else {
         toast.dismiss(loadingToast);
-        toast.error(data.message || 'Login failed');
+        toast.error(data.message || "Login failed");
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       toast.dismiss(loadingToast);
-      toast.error('An error occurred during login');
+      toast.error("An error occurred during login");
     }
   };
 
   return (
     <>
-     <Header/>
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
-      >
-        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Login</h2>
-
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
-              required
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+      <Header />
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
         >
-          Login
-        </button>
-      </form>
-    </div>
-    <Footer/>
+          <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">
+            Login
+          </h2>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
+                required
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+      <Footer />
     </>
   );
 };

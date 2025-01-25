@@ -6,7 +6,7 @@ function VolunteerDashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 md:mt-32">
       <VolunteerNavbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="flex">

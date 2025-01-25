@@ -6,7 +6,7 @@ function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-20">
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="flex">
