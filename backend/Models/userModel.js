@@ -59,7 +59,14 @@ const userSchema = new mongoose.Schema({
     },
     operatingAreas: [{
       type: String
-    }]
+    }],
+    documentsSigned: {
+      type: Boolean,
+      default: false
+    },
+    documentSignedAt: {
+      type: Date
+    }
   },
   isActive: {
     type: Boolean,

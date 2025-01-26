@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 import { FiUser, FiLogOut } from "react-icons/fi";
 import { MdDashboard } from "react-icons/md";
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -19,40 +20,13 @@ function Header() {
     { name: "Contact", path: "/contact" },
   ];
 
-  useEffect(() => {
-    const checkUserStatus = () => {
-      const token = localStorage.getItem("token");
-      const userName = localStorage.getItem("userName");
-      const userRole = localStorage.getItem("userRole");
-
-      if (token && userName) {
-        setUser({ name: userName, role: userRole });
-      } else {
-        setUser(null);
-      }
-    };
-
-    // Check initially
-    checkUserStatus();
-
-    // Add event listener for storage changes
-    window.addEventListener("storage", checkUserStatus);
-
-    // Add custom event listener for login/logout
-    window.addEventListener("userStateChange", checkUserStatus);
-
-    return () => {
-      window.removeEventListener("storage", checkUserStatus);
-      window.removeEventListener("userStateChange", checkUserStatus);
-    };
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-    setUser(null);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setShowDropdown(false); // Close dropdown after logout
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const getDashboardLink = () => {
@@ -60,7 +34,7 @@ function Header() {
       case "ngo":
         return "/dashboard";
       case "volunteer":
-        return "/Voldash";
+        return "/voldash";
       default:
         return "/user-dashboard";
     }

@@ -3,6 +3,8 @@
 // import ActivitySummary from '../../components/volunteer/ActivitySummary';
 // import NotificationsList from '../../components/volunteer/NotificationsList';
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import VolunteerDashboardLayout from '../VolunteerDashCompo/VolunteerDashboardLayout';
 import IncidentList from '../VolunteerDashCompo/IncidentList';
 import ActivitySummary from '../VolunteerDashCompo/ActivitySummary';
@@ -15,6 +17,20 @@ const VolunteerDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get('status');
+    
+    if (status === 'completed') {
+      // Clear the URL parameter
+      navigate('/voldash', { replace: true });
+      // Show success message
+      toast.success('Documents signed successfully!');
+    }
+  }, [location, navigate]);
 
   useEffect(() => {
     const fetchData = async () => {

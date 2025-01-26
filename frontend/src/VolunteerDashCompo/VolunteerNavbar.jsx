@@ -1,15 +1,15 @@
-import { Bars3Icon } from '@heroicons/react/24/outline';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 function VolunteerNavbar({ onMenuClick }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    toast.success('Logged out successfully');
-    navigate('/login');
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully");
+    navigate("/login");
   };
 
   return (
@@ -25,8 +25,8 @@ function VolunteerNavbar({ onMenuClick }) {
               <Bars3Icon className="h-6 w-6" />
             </button>
             <div className="hidden lg:flex items-center ml-4">
-              <span className="text-xl font-semibold text-orange-500">
-                Volunteer Dashboard
+              <span className="text-xl font-semibold text-green-500">
+                Keep it pawsitive
               </span>
             </div>
             {/* Mobile title */}
@@ -39,15 +39,15 @@ function VolunteerNavbar({ onMenuClick }) {
 
           {/* Right side */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link 
+            <Link
               to="/report-incident"
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
               <span className="hidden sm:inline">Back to Home</span>
               <span className="sm:hidden">Home</span>
             </Link>
-            
-            <button
+
+            {/* <button
               onClick={handleLogout}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
             >
@@ -60,7 +60,7 @@ function VolunteerNavbar({ onMenuClick }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               <span className="hidden sm:inline">Logout</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

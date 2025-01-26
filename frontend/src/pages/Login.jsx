@@ -1,11 +1,15 @@
 import { useState } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useAuth } from '../context/AuthContext';
+import { motion } from "framer-motion";
+import { FiMail, FiLock } from "react-icons/fi";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,12 +42,11 @@ const LoginForm = () => {
       console.log(data._id);
 
       if (response.ok) {
-        // Store the token in localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userName", data.name);
-        localStorage.setItem("userRole", data.role);
-        localStorage.setItem("userId", data._id);
-
+        login({
+          token: data.token,
+          name: data.name,
+          role: data.role
+        });
         toast.dismiss(loadingToast);
         toast.success("Login successful!");
 
@@ -51,7 +54,7 @@ const LoginForm = () => {
         if (data.role === "ngo") {
           navigate("/dashboard");
         } else if (data.role === "volunteer") {
-          navigate("/report-incident");
+          navigate("/voldash");
         } else {
           navigate("/report-incident"); // Default redirect for regular users
         }
@@ -69,51 +72,83 @@ const LoginForm = () => {
   return (
     <>
       <Header />
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
-        >
-          <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">
-            Login
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="mt-1 block w-full h-12 rounded-lg border-gray-300 shadow-md focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 p-2"
-                required
-              />
-            </div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+        <div className="w-full max-w-4xl p-8 flex shadow-2xl rounded-2xl bg-white m-8">
+          {/* Left side - Illustration */}
+          <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8 bg-orange-50 rounded-l-xl">
+            <img 
+              src="/helpinghand.png" 
+              alt="Login" 
+              className="w-full max-w-sm"
+            />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
+
+          {/* Right side - Form */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="w-full lg:w-1/2 p-8"
           >
-            Login
-          </button>
-        </form>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-800">Welcome Back!</h2>
+              <p className="text-gray-600 mt-2">Please sign in to your account</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="pl-10 w-full h-12 rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="pl-10 w-full h-12 rounded-lg border-gray-200 shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                type="submit"
+                className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors duration-200 shadow-md"
+              >
+                Sign In
+              </motion.button>
+
+              <div className="text-center mt-6">
+                <p className="text-gray-600">
+                  Don't have an account?{" "}
+                  <Link to="/register" className="text-orange-500 hover:text-orange-600 font-medium">
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </motion.div>
+        </div>
       </div>
       <Footer />
     </>

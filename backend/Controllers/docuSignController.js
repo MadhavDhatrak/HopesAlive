@@ -97,12 +97,12 @@ const createSigningUrl = async (req, res) => {
 
     console.log('Created envelope:', envelope.envelopeId);
 
-    // Create recipient view request
+    // Create recipient view request for volunteer
     const recipientViewRequest = {
       authenticationMethod: 'none',
       clientUserId: userId,
       recipientId: '1',
-      returnUrl: `${process.env.FRONTEND_URL}/volunteer/dashboard`,
+      returnUrl: `${process.env.FRONTEND_URL}/voldash?status=completed`,
       userName: user.name,
       email: user.email
     };
@@ -130,6 +130,78 @@ const createSigningUrl = async (req, res) => {
       accountId: process.env.DOCUSIGN_ACCOUNT_ID
     });
 
+    res.status(500).json({
+      error: 'Failed to create signing URL',
+      details: error.response?.body || error.message
+    });
+  }
+};
+
+const createNgoSigningUrl = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    // Find user
+    const user = await User.findById(userId);
+    if (!user || user.role !== 'ngo') {
+      return res.status(404).json({ error: 'NGO user not found' });
+    }
+
+    // Get DocuSign access token
+    const accessToken = await getAccessToken();
+
+    // Initialize DocuSign API
+    const dsApiClient = new docusign.ApiClient();
+    dsApiClient.setBasePath(process.env.DOCUSIGN_BASE_PATH);
+    dsApiClient.addDefaultHeader('Authorization', `Bearer ${accessToken}`);
+
+    // Create envelope definition
+    const envelopeDefinition = {
+      templateId: process.env.DOCUSIGN_NGO_TEMPLATE_ID,
+      emailSubject: "Please sign your NGO partnership documents",
+      status: "sent",
+      templateRoles: [{
+        email: user.email,
+        name: user.name,
+        roleName: "NGO_Representative",
+        clientUserId: userId,
+        recipientId: "1"
+      }]
+    };
+
+    // Create envelope API instance
+    const envelopesApi = new docusign.EnvelopesApi(dsApiClient);
+    
+    // Create the envelope
+    const envelope = await envelopesApi.createEnvelope(
+      process.env.DOCUSIGN_ACCOUNT_ID,
+      { envelopeDefinition }
+    );
+
+    // Create recipient view request for NGO
+    const recipientViewRequest = {
+      authenticationMethod: 'none',
+      clientUserId: userId,
+      recipientId: '1',
+      returnUrl: `${process.env.FRONTEND_URL}/dashboard?status=completed`,
+      userName: user.name,
+      email: user.email
+    };
+
+    // Get the recipient view (signing URL)
+    const recipientView = await envelopesApi.createRecipientView(
+      process.env.DOCUSIGN_ACCOUNT_ID,
+      envelope.envelopeId,
+      { recipientViewRequest }
+    );
+
+    res.json({ 
+      redirectUrl: recipientView.url,
+      envelopeId: envelope.envelopeId 
+    });
+
+  } catch (error) {
+    console.error('DocuSign Error:', error);
     res.status(500).json({
       error: 'Failed to create signing URL',
       details: error.response?.body || error.message
@@ -192,4 +264,4 @@ function verifyDocuSignWebhook(payload, hmac) {
   return hmac === calculatedHmac;
 }
 
-export { createSigningUrl, handleDocuSignWebhook };
+export { createSigningUrl, createNgoSigningUrl, handleDocuSignWebhook };

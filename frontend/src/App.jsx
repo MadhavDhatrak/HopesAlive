@@ -16,12 +16,13 @@ import UserDashboard from './UserDashBoard/UserDashboard';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Header from './components/Header';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <>
-      <ToastContainer position="top-right" />
-      <Router>
+    <Router>
+      <AuthProvider>
+        <ToastContainer position="top-right" autoClose={3000} />
         <Header/>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -38,8 +39,8 @@ function App() {
            <Route path="/dashboard/settings" element={<MaintenancePage />} />
            <Route path="/user-dashboard" element={<UserDashboard />} />
         </Routes>
-      </Router>
-    </>
+      </AuthProvider>
+    </Router>
   )
 }
 

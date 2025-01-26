@@ -67,8 +67,19 @@ export const register = async (req, res) => {
         requiresDocuments: true,
         message: "Please complete document signing",
       });
-    } else if (role === "ngo" && ngoDetails) {
+    } else if (role === "ngo") {
+      userData.status = "pending_documents";
       userData.ngoDetails = ngoDetails;
+      
+      const newUser = await User.create(userData);
+      const token = generateToken(newUser._id);
+      
+      return res.status(201).json({
+        _id: newUser._id,
+        token,
+        requiresDocuments: true,
+        message: "Please complete NGO document signing"
+      });
     }
 
     const user = await User.create(userData);

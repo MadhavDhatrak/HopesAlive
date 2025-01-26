@@ -1,11 +1,28 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import DashboardLayout from '../DashboardCompo/DashboardLayout';
 import StatsCards from '../DashboardCompo/StatsCards';
 import RecentIncidents from '../DashboardCompo/RecentIncidents';
 import IncidentMap from '../DashboardCompo/IncidentMap';
 import { useRef } from 'react';
 
-function Dashboard() {
+const Dashboard = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const statsRef = useRef();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get('status');
+    
+    if (status === 'completed') {
+      // Clear the URL parameter
+      navigate('/dashboard', { replace: true });
+      // Show success message
+      toast.success('NGO documents signed successfully!');
+    }
+  }, [location, navigate]);
 
   const handleStatusUpdate = () => {
     // Refresh stats when incident status changes
@@ -22,6 +39,6 @@ function Dashboard() {
       </div>
     </DashboardLayout>
   );
-}
+};
 
 export default Dashboard;
