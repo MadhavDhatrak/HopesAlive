@@ -226,9 +226,9 @@ function Header() {
                       Login
                     </button>
                   </Link>
-                  <Link to="/report-incident">
+                  <Link to="/register">
                     <button className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
-                      Report
+                      Register
                     </button>
                   </Link>
                 </div>

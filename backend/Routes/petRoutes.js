@@ -1,7 +1,7 @@
 import express from 'express';
 import { getPets, createPet, getPetDetails } from '../Controllers/petController.js';
-import upload from '../middleware/uploadMiddleware.js';
-import protectedRoute from '../middleware/protected.js';
+import upload from '../Middleware/uploadMiddleware.js';
+import protectedRoute from '../Middleware/protected.js';
 
 const router = express.Router();
 

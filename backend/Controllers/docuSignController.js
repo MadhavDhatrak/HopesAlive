@@ -44,6 +44,11 @@ const createSigningUrl = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Validate email addresses
+    if (!user.email) {
+      return res.status(400).json({ error: 'User email is required' });
+    }
+
     // Get DocuSign access token
     const accessToken = await getAccessToken();
 
@@ -61,16 +66,21 @@ const createSigningUrl = async (req, res) => {
         email: user.email,
         name: user.name,
         roleName: "Volunteer",
-        clientUserId: userId
-      }]
+        clientUserId: userId,
+        recipientId: "1"
+      }],
+      copyRecipientData: "true",
+      enforceSignerVisibility: "true",
+      enableWetSign: "true",
+      allowMarkup: "false",
+      allowReassign: "false"
     };
 
-    console.log('Creating envelope with definition:', JSON.stringify({
+    console.log('Creating envelope with:', {
       templateId: process.env.DOCUSIGN_TEMPLATE_ID,
-      email: user.email,
-      name: user.name,
-      roleName: "Volunteer"
-    }, null, 2));
+      recipientEmail: user.email,
+      recipientName: user.name
+    });
 
     // Create envelope API instance and create envelope
     const envelopesApi = new docusign.EnvelopesApi(dsApiClient);

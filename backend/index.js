@@ -8,7 +8,7 @@ import ngoRoutes from "./Routes/NgoRoutes.js";
 import volunteerRoutes from "./Routes/volunteerRoutes.js"; 
 import cors from "cors";
 import docuSignRoutes from './Routes/docuSignRoutes.js';
-import petRoutes from './routes/petRoutes.js';
+import petRoutes from './Routes/petRoutes.js';
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
