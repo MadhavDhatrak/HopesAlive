@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import VolunteerDocuments from "../components/VolunteerDocuments";
 import { motion } from "framer-motion";
 import { FiUser, FiMail, FiLock, FiPhone, FiMapPin } from "react-icons/fi";
+import NgoDocuments from "../components/NgoDocuments";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ const RegisterForm = () => {
   };
 
   const handleRegistrationSuccess = (data) => {
-    // Store the token immediately when received
+    // Store the token
     if (data.token) {
         localStorage.setItem('token', data.token);
     }
@@ -108,9 +109,16 @@ const RegisterForm = () => {
         setShowDocuments(true);
         setUserData(data);
     } else {
-        navigate('/volunteer/dashboard');
+        // Redirect based on role
+        if (formData.role === 'ngo') {
+            navigate('/dashboard');
+        } else if (formData.role === 'volunteer') {
+            navigate('/volunteer/dashboard');
+        } else {
+            navigate('/user-dashboard');
+        }
     }
-};
+  };
 
   return (
     <>
@@ -341,10 +349,19 @@ const RegisterForm = () => {
             </div>
           </motion.div>
         ) : (
-          <VolunteerDocuments 
-            userId={userData._id} 
-            onComplete={() => navigate('/volunteer/dashboard')} 
-          />
+          <>
+            {formData.role === 'ngo' ? (
+              <NgoDocuments 
+                userId={userData._id} 
+                onComplete={() => navigate('/dashboard')} 
+              />
+            ) : (
+              <VolunteerDocuments 
+                userId={userData._id} 
+                onComplete={() => navigate('/volunteer/dashboard')} 
+              />
+            )}
+          </>
         )}
       </div>
       <Footer />

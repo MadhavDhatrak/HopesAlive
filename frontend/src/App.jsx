@@ -17,6 +17,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import Header from './components/Header';
 import { AuthProvider } from './context/AuthContext';
+import VolunteerPage from './pages/VolunteerPage';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/dashboard/analytics" element={<MaintenancePage />} />
            <Route path="/dashboard/settings" element={<MaintenancePage />} />
            <Route path="/user-dashboard" element={<UserDashboard />} />
+           <Route path="/volunteer" element={<VolunteerPage />} />
         </Routes>
       </AuthProvider>
     </Router>

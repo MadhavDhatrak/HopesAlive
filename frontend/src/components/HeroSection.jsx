@@ -54,7 +54,7 @@ function HeroSection() {
                   <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                 </motion.button>
               </Link>
-              <Link to="/volunteer">
+              <Link to="/contact">
                 <motion.button 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
