@@ -31,6 +31,7 @@ router.get('/my-assignments', protectedRoute, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+});
 
 router.get('/:id', protectedRoute, async (req, res) => {
   try {
@@ -47,8 +48,6 @@ router.get('/:id', protectedRoute, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
-
 });
 
 export default router;

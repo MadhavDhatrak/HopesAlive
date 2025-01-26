@@ -1,30 +1,30 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import indianCities from '../data/indianCities';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import indianCities from "../data/indianCities";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 function ReportIncident() {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
-    description: '',
+    description: "",
     location: {
-      type: 'Point',
+      type: "Point",
       coordinates: [],
-      address: ''
+      address: "",
     },
     animalInfo: {
-      description: '',
+      description: "",
       aiSeverityAssessment: {
         score: 0,
-        category: 'PENDING',
-        assessmentDetails: ''
-      }
+        category: "PENDING",
+        assessmentDetails: "",
+      },
     },
-    city: ''
+    city: "",
   });
 
   const [error, setError] = useState(null);
@@ -34,16 +34,16 @@ function ReportIncident() {
   const handleCityChange = (e) => {
     const selectedCity = e.target.value.toLowerCase();
     const cityData = indianCities[selectedCity];
-    
+
     if (cityData) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         city: cityData.name,
         location: {
           ...prev.location,
-          type: 'Point',
-          coordinates: cityData.coordinates
-        }
+          type: "Point",
+          coordinates: cityData.coordinates,
+        },
       }));
     }
   };
@@ -55,7 +55,7 @@ function ReportIncident() {
         setError("File size should be less than 10MB");
         return;
       }
-      
+
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -67,71 +67,102 @@ function ReportIncident() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    const loadingToast = toast.loading('Submitting report...');
+    const loadingToast = toast.loading("Submitting report...");
 
     try {
-      // Create FormData object for file upload
       const formDataToSend = new FormData();
-      
-      // Append the image file
+
       if (imageFile) {
-        formDataToSend.append('animalPhoto', imageFile);
+        formDataToSend.append("animalPhoto", imageFile);
       }
 
-      // Append other form data as JSON
-      formDataToSend.append('data', JSON.stringify({
-        description: formData.description,
-        location: formData.location,
-        animalInfo: {
-          description: formData.animalInfo.description,
-          aiSeverityAssessment: formData.animalInfo.aiSeverityAssessment
-        },
-        city: formData.city
-      }));
+      formDataToSend.append(
+        "data",
+        JSON.stringify({
+          description: formData.description,
+          location: formData.location,
+          animalInfo: {
+            description: formData.animalInfo.description,
+            aiSeverityAssessment: formData.animalInfo.aiSeverityAssessment,
+          },
+          city: formData.city,
+        })
+      );
 
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/incidents/create', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formDataToSend,
-      });
+      const token = localStorage.getItem("token");
+      const userRole = localStorage.getItem("userRole"); // Get user role
+
+      const response = await fetch(
+        "http://localhost:3000/api/incidents/create",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formDataToSend,
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         toast.dismiss(loadingToast);
-        toast.success('Incident reported successfully!');
-        navigate('/dashboard'); // or wherever you want to redirect
+        toast.success("Incident reported successfully!");
+
+        // Redirect based on user role
+        const role = userRole?.toLowerCase();
+        switch (role) {
+          case "volunteer":
+            navigate("/voldash");
+            break;
+          case "ngo":
+            navigate("/dashboard");
+            break;
+          case "user":
+            navigate("/user-dashboard");
+            break;
+          default:
+            navigate("/user-dashboard");
+            break;
+        }
       } else {
-        throw new Error(data.message || 'Failed to submit report');
+        throw new Error(data.message || "Failed to submit report");
       }
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       toast.dismiss(loadingToast);
-      toast.error(error.message || 'Failed to submit report');
+      toast.error(error.message || "Failed to submit report");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
-      
+
       <main className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           {/* Breadcrumb */}
           <nav className="mb-6">
             <ol className="flex items-center space-x-2 text-sm">
               <li>
-                <a href="/" className="text-orange-500 hover:text-orange-600 transition-colors">
+                <a
+                  href="/"
+                  className="text-orange-500 hover:text-orange-600 transition-colors"
+                >
                   Home
                 </a>
               </li>
               <li>
-                <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </li>
               <li className="text-gray-700">Report Incident</li>
@@ -139,7 +170,7 @@ function ReportIncident() {
           </nav>
 
           {/* Form Container */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100"
@@ -147,7 +178,7 @@ function ReportIncident() {
             <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
               Report an Incident
             </h1>
-            
+
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
                 {error}
@@ -160,7 +191,9 @@ function ReportIncident() {
                 <div className="space-y-6">
                   {/* Incident Description */}
                   <div className="space-y-2">
-                    <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Basic Information
+                    </h2>
                     <div className="bg-gray-50 p-4 rounded-xl">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Incident Description *
@@ -170,10 +203,12 @@ function ReportIncident() {
                         className="w-full rounded-xl bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400 p-2"
                         placeholder="Describe what happened (e.g., Stray cat found injured)"
                         value={formData.description}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          description: e.target.value
-                        }))}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            description: e.target.value,
+                          }))
+                        }
                         required
                       />
                     </div>
@@ -181,7 +216,9 @@ function ReportIncident() {
 
                   {/* Location Section */}
                   <div className="space-y-2">
-                    <h2 className="text-lg font-semibold text-gray-900">Location Details</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Location Details
+                    </h2>
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -194,8 +231,11 @@ function ReportIncident() {
                           required
                         >
                           <option value="">Select a city</option>
-                          {Object.values(indianCities).map(city => (
-                            <option key={city.name} value={city.name.toLowerCase()}>
+                          {Object.values(indianCities).map((city) => (
+                            <option
+                              key={city.name}
+                              value={city.name.toLowerCase()}
+                            >
                               {city.name}, {city.state}
                             </option>
                           ))}
@@ -211,13 +251,15 @@ function ReportIncident() {
                           className="w-full rounded-xl p-2 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
                           placeholder="Enter specific location"
                           value={formData.location.address}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            location: {
-                              ...prev.location,
-                              address: e.target.value
-                            }
-                          }))}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              location: {
+                                ...prev.location,
+                                address: e.target.value,
+                              },
+                            }))
+                          }
                           required
                         />
                       </div>
@@ -253,7 +295,9 @@ function ReportIncident() {
 
                   {/* Contact Information */}
                   <div className="space-y-2">
-                    <h2 className="text-lg font-semibold text-gray-900">Contact Information</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Contact Information
+                    </h2>
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Reporter's Contact Info */}
@@ -286,7 +330,9 @@ function ReportIncident() {
                             type="checkbox"
                             className="rounded text-orange-500 focus:ring-orange-500"
                           />
-                          <span>This is an emergency - Immediate attention required</span>
+                          <span>
+                            This is an emergency - Immediate attention required
+                          </span>
                         </label>
                       </div>
 
@@ -309,7 +355,9 @@ function ReportIncident() {
                 <div className="space-y-6">
                   {/* Animal Information */}
                   <div className="space-y-2">
-                    <h2 className="text-lg font-semibold text-gray-900">Animal Details</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Animal Details
+                    </h2>
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -320,13 +368,15 @@ function ReportIncident() {
                           className="w-full rounded-xl p-2 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
                           placeholder="Describe the animal's condition"
                           value={formData.animalInfo.description}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            animalInfo: {
-                              ...prev.animalInfo,
-                              description: e.target.value
-                            }
-                          }))}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              animalInfo: {
+                                ...prev.animalInfo,
+                                description: e.target.value,
+                              },
+                            }))
+                          }
                           required
                         />
                       </div>
@@ -338,17 +388,21 @@ function ReportIncident() {
                           </label>
                           <select
                             className="w-full rounded-xl p-2 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
-                            value={formData.animalInfo.aiSeverityAssessment.category}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              animalInfo: {
-                                ...prev.animalInfo,
-                                aiSeverityAssessment: {
-                                  ...prev.animalInfo.aiSeverityAssessment,
-                                  category: e.target.value
-                                }
-                              }
-                            }))}
+                            value={
+                              formData.animalInfo.aiSeverityAssessment.category
+                            }
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                animalInfo: {
+                                  ...prev.animalInfo,
+                                  aiSeverityAssessment: {
+                                    ...prev.animalInfo.aiSeverityAssessment,
+                                    category: e.target.value,
+                                  },
+                                },
+                              }))
+                            }
                             required
                           >
                             <option value="PENDING">Select severity</option>
@@ -368,17 +422,21 @@ function ReportIncident() {
                             min="1"
                             max="10"
                             className="w-full rounded-xl p-2 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
-                            value={formData.animalInfo.aiSeverityAssessment.score}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              animalInfo: {
-                                ...prev.animalInfo,
-                                aiSeverityAssessment: {
-                                  ...prev.animalInfo.aiSeverityAssessment,
-                                  score: parseInt(e.target.value)
-                                }
-                              }
-                            }))}
+                            value={
+                              formData.animalInfo.aiSeverityAssessment.score
+                            }
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                animalInfo: {
+                                  ...prev.animalInfo,
+                                  aiSeverityAssessment: {
+                                    ...prev.animalInfo.aiSeverityAssessment,
+                                    score: parseInt(e.target.value),
+                                  },
+                                },
+                              }))
+                            }
                             required
                           />
                         </div>
@@ -392,17 +450,22 @@ function ReportIncident() {
                           rows={2}
                           className="w-full rounded-xl p-3 bg-white shadow-sm transition-all text-sm border-gray-200 outline-none placeholder:text-gray-400"
                           placeholder="Provide details about the severity assessment"
-                          value={formData.animalInfo.aiSeverityAssessment.assessmentDetails}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            animalInfo: {
-                              ...prev.animalInfo,
-                              aiSeverityAssessment: {
-                                ...prev.animalInfo.aiSeverityAssessment,
-                                assessmentDetails: e.target.value
-                              }
-                            }
-                          }))}
+                          value={
+                            formData.animalInfo.aiSeverityAssessment
+                              .assessmentDetails
+                          }
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              animalInfo: {
+                                ...prev.animalInfo,
+                                aiSeverityAssessment: {
+                                  ...prev.animalInfo.aiSeverityAssessment,
+                                  assessmentDetails: e.target.value,
+                                },
+                              },
+                            }))
+                          }
                           required
                         />
                       </div>
@@ -411,24 +474,30 @@ function ReportIncident() {
 
                   {/* Photo Evidence Section - Updated styling */}
                   <div className="space-y-3">
-                    <h2 className="text-lg font-semibold text-gray-900">Photo Evidence</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Photo Evidence
+                    </h2>
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Upload Photo
                         </label>
-                        <div 
+                        <div
                           className="min-h-[200px] flex flex-col justify-center items-center px-4 py-6 border-2 border-gray-200 border-dashed rounded-xl bg-white hover:border-orange-500 transition-colors cursor-pointer"
-                          onClick={() => document.getElementById('photo-upload').click()}
+                          onClick={() =>
+                            document.getElementById("photo-upload").click()
+                          }
                         >
                           {imagePreview ? (
                             <div className="relative w-full h-full flex flex-col items-center">
-                              <img 
-                                src={imagePreview} 
-                                alt="Preview" 
-                                className="max-h-[160px] object-contain mx-auto rounded-lg shadow-md" 
+                              <img
+                                src={imagePreview}
+                                alt="Preview"
+                                className="max-h-[160px] object-contain mx-auto rounded-lg shadow-md"
                               />
-                              <div className="mt-4 text-sm text-gray-600">Click to change image</div>
+                              <div className="mt-4 text-sm text-gray-600">
+                                Click to change image
+                              </div>
                             </div>
                           ) : (
                             <div className="text-center">
@@ -448,7 +517,9 @@ function ReportIncident() {
                               <div className="text-sm text-gray-600 mb-2">
                                 Drop image here, or click to select
                               </div>
-                              <p className="text-xs text-gray-500">PNG, JPG up to 10MB</p>
+                              <p className="text-xs text-gray-500">
+                                PNG, JPG up to 10MB
+                              </p>
                             </div>
                           )}
                           <input
@@ -493,4 +564,3 @@ function ReportIncident() {
 }
 
 export default ReportIncident;
-
