@@ -250,7 +250,7 @@ const UserDashboard = () => {
                             <div className="text-center py-8">
                                 <p className="text-gray-500">No incidents reported yet.</p>
                                 <button 
-                                    onClick={() => navigate('/report')}
+                                    onClick={() => navigate('/report-incident')}
                                     className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                 >
                                     Report New Incident
