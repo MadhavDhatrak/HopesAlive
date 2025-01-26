@@ -8,6 +8,7 @@ import ngoRoutes from "./Routes/NgoRoutes.js";
 import volunteerRoutes from "./Routes/volunteerRoutes.js"; 
 import cors from "cors";
 import docuSignRoutes from './Routes/docuSignRoutes.js';
+import petRoutes from './routes/petRoutes.js';
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
@@ -29,6 +30,7 @@ app.use("/api/ngo",ngoRoutes);
 app.use("/api/volunteer",volunteerRoutes);
 app.use("/api/uploads", express.static("uploads"));
 app.use('/api/docusign', docuSignRoutes);
+app.use('/api/pets', petRoutes);
 
 app.listen(port, () => {
     connectDB();
