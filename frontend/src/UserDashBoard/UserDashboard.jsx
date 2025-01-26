@@ -130,140 +130,135 @@ const UserDashboard = () => {
     if (error) return <div className="text-red-500 text-center">{error}</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Profile Section */}
-                <div className="bg-white rounded-lg shadow p-6 mb-8">
-                    <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                {/* Header Section */}
+                <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-center">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">User Dashboard</h1>
-                            <p className="text-gray-600">Welcome, {userName || "Guest"}</p>
+                            <h1 className="text-3xl font-bold text-gray-900">Welcome Back!</h1>
+                            <p className="text-lg text-gray-600 mt-2">{userName || "User"}</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 mt-4 sm:mt-0">
                             <button
                                 onClick={() => setOpenNotifications(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                className="flex items-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
                             >
                                 <FaRegBell className="w-4 h-4" />
+                                <span className="hidden sm:inline">Notifications</span>
                             </button>
                             <button
                                 onClick={() => setIsEditing(!isEditing)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 <FiEdit2 className="w-4 h-4" />
-                                {isEditing ? "Cancel" : "Edit Profile"}
+                                <span className="hidden sm:inline">Edit Profile</span>
                             </button>
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                className="flex items-center gap-1 px-3 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors"
                             >
                                 <FiLogOut className="w-4 h-4" />
-                                Logout
+                                <span className="hidden sm:inline">Logout</span>
                             </button>
                         </div>
                     </div>
 
-                    {isEditing ? (
-                        <form className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Username</label>
-                                <input
-                                    type="text"
-                                    value={formData.username}
-                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                />
+                    {!isEditing && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+                                <h3 className="text-sm font-medium text-blue-600">Total Incidents</h3>
+                                <p className="text-3xl font-bold text-gray-900 mt-1">{userIncidents.length}</p>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Email</label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                />
+                            <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+                                <h3 className="text-sm font-medium text-green-600">Active Cases</h3>
+                                <p className="text-3xl font-bold text-gray-900 mt-1">
+                                    {userIncidents.filter(inc => inc.status === 'in progress').length}
+                                </p>
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                Save Changes
-                            </button>
-                        </form>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-blue-50 p-6 rounded-lg">
-                                <h3 className="text-sm text-gray-600">Your Incidents</h3>
-                                <p className="text-2xl font-bold text-gray-900">{userIncidents.length}</p>
+                            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+                                <h3 className="text-sm font-medium text-purple-600">Pending Review</h3>
+                                <p className="text-3xl font-bold text-gray-900 mt-1">
+                                    {userIncidents.filter(inc => inc.status === 'pending').length}
+                                </p>
                             </div>
                         </div>
                     )}
                 </div>
 
                 {/* Incidents Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-xl font-semibold mb-4">Your Incidents</h2>
-                        <div className="space-y-4">
-                            {userIncidents.length ? (
-                                userIncidents.map((incident) => (
-                                    <div key={incident._id} className="border rounded-lg p-4">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h3 className="font-medium text-gray-900">{incident.animalInfo.description}</h3>
-                                                <p className="text-sm text-gray-500">{new Date(incident.createdAt).toLocaleDateString()}</p>
-                                                <p className="text-sm text-gray-500">Location: {incident.location.address}</p>
-                                                <p className="text-sm text-gray-500">Severity: {incident.animalInfo.aiSeverityAssessment.category}</p>
+                <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">Your Incidents</h2>
+                    <div className="space-y-4">
+                        {userIncidents.length > 0 ? (
+                            userIncidents.map((incident) => (
+                                <div key={incident._id} 
+                                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                                >
+                                    <div className="flex flex-col md:flex-row justify-between">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 flex-wrap">
+                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                    {incident.animalInfo.description}
+                                                </h3>
+                                                <span className={`px-2 py-1 text-sm rounded-full ${
+                                                    incident.status === 'in progress' 
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                    {incident.status}
+                                                </span>
                                             </div>
-                                            <span className={`px-2 py-1 text-xs rounded-full ${incident.status === "resolved" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
-                                                {incident.status}
-                                            </span>
+                                            <div className="mt-2 space-y-1">
+                                                <p className="text-sm text-gray-600">
+                                                    <span className="font-medium">Location:</span> {incident.location.address}
+                                                </p>
+                                                <p className="text-sm text-gray-600">
+                                                    <span className="font-medium">Reported:</span> {
+                                                        new Date(incident.createdAt).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric'
+                                                        })
+                                                    }
+                                                </p>
+                                                {incident.assignedNGO && (
+                                                    <p className="text-sm text-blue-600">
+                                                        <span className="font-medium">Assigned to:</span> {incident.assignedNGO.name}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="mt-3 md:mt-0 md:ml-4">
+                                            <div className="px-3 py-2 bg-gray-50 rounded-md">
+                                                <p className="text-xs font-medium text-gray-500">Severity</p>
+                                                <p className={`text-sm font-bold ${
+                                                    incident.animalInfo.aiSeverityAssessment.category === 'HIGH' 
+                                                        ? 'text-red-600'
+                                                        : incident.animalInfo.aiSeverityAssessment.category === 'MODERATE'
+                                                        ? 'text-yellow-600'
+                                                        : 'text-green-600'
+                                                }`}>
+                                                    {incident.animalInfo.aiSeverityAssessment.category}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                ))
-                            ) : (
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8">
                                 <p className="text-gray-500">No incidents reported yet.</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Resolved Incidents Section */}
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <h2 className="text-xl font-semibold mb-4">Resolved Incidents</h2>
-                        <div className="space-y-4">
-                            <p className="text-gray-500">Currently, there are no resolved incidents.</p>
-                        </div>
+                                <button 
+                                    onClick={() => navigate('/report')}
+                                    className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    Report New Incident
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Notifications Section */}
-                {openNotifications && (
-                    <div className="absolute top-[185px] right-10 w-64 bg-white shadow-lg rounded-lg p-4">
-                        <div className="flex flex-row items-center justify-between mx-2">
-                            <h3 className="text-lg font-semibold mb-2">Notifications</h3>
-                            <button
-                                onClick={() => setOpenNotifications(false)}
-                                className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <IoIosClose size={23} className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <hr className="my-2" />
-                        <ul>
-                            {notifications.map((notification) => (
-                                <li key={notification.id} className={`p-2 mb-2 rounded-lg ${notification.read ? "bg-gray-100" : "bg-blue-50"}`}>
-                                    <p>{notification.message}</p>
-                                    <small className="block text-gray-500">{new Date(notification.createdAt).toLocaleString()}</small>
-                                    {!notification.read && (
-                                        <button onClick={() => markAsRead(notification.id)} className="text-blue-500 hover:underline mt-1">
-                                            Mark as Read
-                                        </button>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
             </div>
         </div>
     );
