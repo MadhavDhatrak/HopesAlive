@@ -38,25 +38,41 @@ const LoginForm = () => {
       });
 
       const data = await response.json();
-
-      console.log(data._id);
-
+      
       if (response.ok) {
+        // Store all necessary user data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data._id);
+        localStorage.setItem('userRole', data.role);
+        localStorage.setItem('userName', data.name);
+
+        // Debug log
+        console.log('Login successful:', {
+          userId: data._id,
+          role: data.role,
+          name: data.name
+        });
+
         login({
           token: data.token,
           name: data.name,
-          role: data.role
+          role: data.role,
+          id: data._id
         });
+
         toast.dismiss(loadingToast);
         toast.success("Login successful!");
 
-        // Redirect based on user role
-        if (data.role === "ngo") {
-          navigate("/dashboard");
-        } else if (data.role === "volunteer") {
-          navigate("/voldash");
-        } else {
-          navigate("/report-incident"); // Default redirect for regular users
+        // Redirect based on role
+        switch (data.role) {
+          case "ngo":
+            navigate("/dashboard");
+            break;
+          case "volunteer":
+            navigate("/voldash");
+            break;
+          default:
+            navigate("/user-dashboard");
         }
       } else {
         toast.dismiss(loadingToast);

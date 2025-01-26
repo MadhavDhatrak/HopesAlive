@@ -22,14 +22,39 @@ const UserDashboard = () => {
     });
 
     useEffect(() => {
+        const checkUserSession = () => {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const userRole = localStorage.getItem('userRole');
+
+            // Debug log
+            console.log('Current session:', {
+                hasToken: !!token,
+                userId,
+                userRole
+            });
+
+            if (!token || !userId) {
+                toast.error('Please log in to access the dashboard');
+                navigate('/login');
+                return false;
+            }
+
+            if (userRole !== 'user') {
+                toast.error('Unauthorized access');
+                navigate('/login');
+                return false;
+            }
+
+            return true;
+        };
+
         const fetchUserData = async () => {
             try {
+                if (!checkUserSession()) return;
+
                 const token = localStorage.getItem('token');
                 const userId = localStorage.getItem('userId');
-
-                if (!userId) {
-                    throw new Error('User ID is not available. Please log in again.');
-                }
 
                 const userResponse = await axios.get(`http://localhost:3000/api/users/profile/${userId}`, {
                     headers: {
@@ -43,21 +68,31 @@ const UserDashboard = () => {
                         Authorization: `Bearer ${token}`
                     }
                 });
-                setUserIncidents(incidentsResponse.data.data);
+                
+                setUserIncidents(incidentsResponse.data.data || []);
+                
             } catch (err) {
                 console.error('Error fetching user data:', err);
-                setError(err.response ? err.response.data.message : err.message);
+                const errorMessage = err.response?.data?.message || err.message;
+                setError(errorMessage);
+                toast.error(errorMessage);
+                
+                if (err.response?.status === 401) {
+                    navigate('/login');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUserData();
-    }, []);
+    }, [navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userName');
         navigate('/login');
         toast.success("Logout")
 

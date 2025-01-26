@@ -184,23 +184,21 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const getUserIncidents = async (req, res) => {
-  const { userId } = req.params; // Get userId from request parameters
+  const { userId } = req.params;
 
-  // Validate userId
   if (!userId) {
     return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
     const incidents = await Incident.find({ user: userId });
-    // Check if incidents were found
-    if (incidents.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No incidents found for this user" });
-    }
-
-    res.status(200).json({ data: incidents });
+    
+    // Return empty array instead of 404 when no incidents found
+    return res.status(200).json({ 
+      data: incidents,
+      message: incidents.length === 0 ? "No incidents found for this user" : "Incidents retrieved successfully"
+    });
+    
   } catch (error) {
     console.error("Error fetching incidents:", error);
     res.status(500).json({ message: "Error fetching incidents" });
