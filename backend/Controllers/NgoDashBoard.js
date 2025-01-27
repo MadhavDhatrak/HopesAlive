@@ -42,6 +42,14 @@ export const getDashboardOverview = async (req, res) => {
 // Get All Incidents for NGO
 export const getAllIncidents = async (req, res) => {
     try {
+        // Check if user is NGO
+        if (req.user.role !== 'ngo') {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied. NGO role required.' 
+            });
+        }
+
         const ngoId = req.user._id;
         const ngoCity = req.user.city;
         
