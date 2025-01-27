@@ -26,7 +26,6 @@ function VolunteerNavbar({ onMenuClick }) {
             </button>
             <div className="hidden lg:flex items-center ml-4">
               <span className="text-xl font-semibold text-green-500">
-                Keep it pawsitive
               </span>
             </div>
             {/* Mobile title */}

@@ -67,51 +67,74 @@ function ReportIncident() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     const loadingToast = toast.loading('Submitting report...');
 
     try {
-      // Create FormData object for file upload
-      const formDataToSend = new FormData();
-      
-      // Append the image file
-      if (imageFile) {
-        formDataToSend.append('animalPhoto', imageFile);
-      }
+        const formDataToSend = new FormData();
+        
+        if (imageFile) {
+            formDataToSend.append('animalPhoto', imageFile);
+        }
 
-      // Append other form data as JSON
-      formDataToSend.append('data', JSON.stringify({
-        description: formData.description,
-        location: formData.location,
-        animalInfo: {
-          description: formData.animalInfo.description,
-          aiSeverityAssessment: formData.animalInfo.aiSeverityAssessment
-        },
-        city: formData.city
-      }));
+        formDataToSend.append('data', JSON.stringify({
+            description: formData.description,
+            location: formData.location,
+            animalInfo: {
+                description: formData.animalInfo.description,
+                aiSeverityAssessment: formData.animalInfo.aiSeverityAssessment
+            },
+            city: formData.city
+        }));
 
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/incidents/create', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formDataToSend,
-      });
+        const token = localStorage.getItem('token');
+        const userRole = localStorage.getItem('role');
+        
+        console.log('Current role before submission:', userRole); // Debug log
 
-      const data = await response.json();
+        const response = await fetch('http://localhost:3000/api/incidents/create', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formDataToSend,
+        });
 
-      if (response.ok) {
-        toast.dismiss(loadingToast);
-        toast.success('Incident reported successfully!');
-        navigate('/dashboard'); // or wherever you want to redirect
-      } else {
-        throw new Error(data.message || 'Failed to submit report');
-      }
+        const data = await response.json();
+
+        if (response.ok) {
+            toast.dismiss(loadingToast);
+            toast.success('Incident reported successfully!');
+            
+            // Handle redirection based on role
+            switch(userRole) {
+                case 'volunteer':
+                    console.log('Redirecting to volunteer dashboard');
+                    setTimeout(() => navigate('/voldash'), 1500);
+                    break;
+                case 'ngo':
+                    console.log('Redirecting to NGO dashboard');
+                    setTimeout(() => navigate('/dashboard'), 1500);
+                    break;
+                case 'user':
+                    console.log('Redirecting to user dashboard');
+                    setTimeout(() => navigate('/user-dashboard'), 1500);
+                    break;
+                default:
+                    console.log('Unknown role:', userRole);
+                    setTimeout(() => navigate('/user-dashboard'), 1500);
+            }
+        } else {
+            throw new Error(data.message || 'Failed to submit report');
+        }
     } catch (error) {
-      console.error('Submission error:', error);
-      toast.dismiss(loadingToast);
-      toast.error(error.message || 'Failed to submit report');
+        console.error('Submission error:', error);
+        toast.dismiss(loadingToast);
+        if (error.message.includes('Unauthorized')) {
+            toast.error('Please login again');
+            setTimeout(() => navigate('/login'), 1500);
+        } else {
+            toast.error(error.message || 'Failed to submit report');
+        }
     }
   };
 
