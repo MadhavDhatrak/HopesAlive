@@ -48,10 +48,10 @@ const RegisterForm = () => {
     
     try {
       // Log the request details
-      console.log('Attempting to connect to:', 'http://localhost:3000/api/users/register');
+      console.log('Attempting to connect to:', `${import.meta.env.VITE_API_URL}/users/register`);
       console.log('With data:', formData);
 
-      const response = await fetch('http://localhost:3000/api/users/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
