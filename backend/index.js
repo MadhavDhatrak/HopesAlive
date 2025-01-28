@@ -15,6 +15,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Set NODE_ENV
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
