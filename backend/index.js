@@ -43,32 +43,33 @@ app.use("/api/pets", petRoutes);
 // Serve uploaded files
 app.use("/api/uploads", express.static("uploads"));
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-    // Serve frontend build files
-    const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+// Serve static files
+const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendBuildPath));
+
+// Handle all routes
+app.get('*', (req, res) => {
+    // Check if the request is for an API route
+    if (req.url.startsWith('/api/')) {
+        return res.status(404).json({ message: 'API route not found' });
+    }
     
-    // Serve static files
-    app.use(express.static(frontendBuildPath));
-    
-    // Serve favicon
-    app.get('/favicon.ico', (req, res) => {
-        res.sendFile(path.join(frontendBuildPath, 'favicon.png'));
-    });
-    
-    // Handle all other routes by serving index.html
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(frontendBuildPath, 'index.html'));
-    });
-} else {
-    app.get('/', (req, res) => {
-        res.send('API is running...');
-    });
-}
+    // Serve the frontend app
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+});
 
 // Start server
-app.listen(port, () => {
-    connectDB();
-    console.log(`Server is running on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port} in ${process.env.NODE_ENV} mode`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
 
