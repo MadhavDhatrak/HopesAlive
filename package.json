@@ -6,6 +6,8 @@
   "scripts": {
     "start": "concurrently \"node backend/index.js\" \"ngrok http 3000\"",
     "build": "npm install && cd frontend && npm install && npm run build && cd ..",
+    "render-build": "npm install && cd frontend && npm install && npm run build && cd ..",
+    "render-start": "node backend/index.js",
     "dev": "nodemon backend/index.js",
     "tunnel": "ngrok http 3000"
   },
