@@ -4,19 +4,17 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node backend/index.js",
-    "build": "cd frontend && npm install && npm run build",
+    "start": "concurrently \"node backend/index.js\" \"ngrok http 3000\"",
+    "build": "npm install && cd frontend && npm install && npm run build && cd ..",
     "dev": "nodemon backend/index.js",
-    "dev:tunnel": "concurrently \"npm run dev\" \"ngrok http 3000\"",
-    "tunnel": "ngrok http 3000",
-    "render-build": "npm install && cd frontend && npm install && npm run build && cd ..",
-    "render-start": "node backend/index.js"
+    "tunnel": "ngrok http 3000"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "docusign-esign": "^8.0.1",
