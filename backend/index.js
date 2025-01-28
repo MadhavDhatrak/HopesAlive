@@ -29,13 +29,11 @@ app.use(cookieParser());
 
 // CORS configuration - this needs to be before routes
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://hopesalive-8.onrender.com'
-    : 'http://localhost:5173',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    origin: ['https://hopesalive-8.onrender.com', 'https://hopesalive-8.onrender.com/'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 
 // API routes
 app.use("/api/users", userRoutes);
